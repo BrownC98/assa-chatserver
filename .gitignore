@@ -1,0 +1,77 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/
+
+# IDE specific files
+# IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# VS Code
+.vscode/
+
+# Eclipse
+.project
+.classpath
+.settings/
+bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Compiled class files and archives
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Log files
+*.log
+logs/
+
+# OS generated files
+# Mac
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+# Windows
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*~
+# temp/ # 만약 temp 폴더를 사용한다면
+
+# Specific files from your project structure to ignore
+# (예: 백업 파일이나 개인적인 테스트 파일)
+src/main/java/com/teamnova/ChatServer_origin.java
+src/main/resources/config.properties
+
+# Local configuration files that should not be committed (if any)
+# 예: src/main/resources/local-config.properties
+# src/main/resources/application-local.properties
+
+# Secrets (generally better to use environment variables or a secrets manager)
+# .env
+# secrets.yml

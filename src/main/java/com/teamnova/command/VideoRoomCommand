@@ -1,0 +1,23 @@
+// package main.command;
+
+// import main.dto.SDP;
+
+// public class VideoRoomCommand extends BaseCommand{
+
+//     public Long roomId;
+//     public String videoRoomId; // UUID
+//     public SDP sdp;
+
+//     public VideoRoomCommand(Long roomId) {
+//         super(Action.VIDEO_ROOM);
+//         this.roomId = roomId;
+//     }
+
+//     public static VideoRoomCommand fromJson(String json) throws Exception {
+//         return fromJson(json, VideoRoomCommand.class);
+//     }
+
+//     public enum TYPE{
+//         CREATE, JOIN, EXIT
+//     }
+// }
