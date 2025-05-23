@@ -80,6 +80,13 @@
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.0.2</version>
+          <configuration>
+        <archive>
+          <manifest>
+            <mainClass>com.teamnova.Main</mainClass> <!-- ← 여기에 실제 Main 클래스 전체 경로 지정 -->
+          </manifest>
+        </archive>
+      </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
