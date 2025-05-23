@@ -3,28 +3,24 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main  # main 브랜치 푸시 시 실행
+      - main  # 또는 배포용 브랜치명
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Copy SSH key and set permissions
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-      - name: Deploy to EC2
-        run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@43.200.172.122 << 'EOF'
-            cd /home/ubuntu/assa-chatserver
-            git pull
-            mvn clean package
-            pkill -f 'java -jar' || true
-            nohup java -jar target/assa-chat-server-1.0-SNAPSHOT.jar > app.log 2>&1 &
-          EOF
+    - name: Deploy via SSH
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          cd ~/assa-chatserver
+          git pull origin main
+          /usr/bin/mvn clean package -DskipTests
+          sudo systemctl restart chatserver
