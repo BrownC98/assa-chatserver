@@ -2,8 +2,7 @@ package com.teamnova.command;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import com.teamnova.Utils.TimeUtils;
+import com.teamnova.utils.TimeUtils;
 
 public abstract class BaseCommand {
 

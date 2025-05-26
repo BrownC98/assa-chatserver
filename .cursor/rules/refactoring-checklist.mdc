@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: true
+alwaysApply: false
 ---
 # ASSA Chat Server 1일 리팩토링 체크리스트
 

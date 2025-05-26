@@ -11,6 +11,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.teamnova.config.PropertiesManager;
+
 /**
  * 채팅 서버 메인 클래스
  */

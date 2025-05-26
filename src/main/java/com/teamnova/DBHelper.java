@@ -14,7 +14,6 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.teamnova.Utils.TimeUtils;
 import com.teamnova.command.Action;
 import com.teamnova.command.BaseCommand;
 import com.teamnova.command.CreateRoomCommand;
@@ -22,9 +21,11 @@ import com.teamnova.command.CreateRoomCommand.RoomType;
 import com.teamnova.command.ResponseCommand;
 import com.teamnova.command.ResponseCommand.TransmissionStatus;
 import com.teamnova.command.SendMessageCommand;
+import com.teamnova.config.PropertiesManager;
 import com.teamnova.dto.Message;
 import com.teamnova.dto.MessageStatus;
 import com.teamnova.dto.RoomData;
+import com.teamnova.utils.TimeUtils;
 
 /**
  * db 접속 및 사용을 편리하게하는 메소드

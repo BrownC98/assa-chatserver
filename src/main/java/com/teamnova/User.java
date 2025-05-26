@@ -13,7 +13,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.teamnova.Utils.TimeUtils;
 import com.teamnova.command.Action;
 import com.teamnova.command.BaseCommand;
 import com.teamnova.command.CheckReceiveCommand;
@@ -31,6 +30,7 @@ import com.teamnova.command.ResponseCommand;
 import com.teamnova.command.RoomInfoCommand;
 import com.teamnova.command.SDPCommand;
 import com.teamnova.command.SendMessageCommand;
+import com.teamnova.utils.TimeUtils;
 
 /**
  * 사용자 클래스 - 리팩토링을 통해 3개 핸들러로 책임 분리
@@ -298,7 +298,7 @@ public class User extends Thread {
 
         if (connectionManager.isConnected()) {
             connectionManager.getOutputStream().println(command.toJson());
-        log.debug("보낸 메시지 내용 : {}", command.toJson());
+            log.debug("보낸 메시지 내용 : {}", command.toJson());
         } else {
             log.debug("연결이 끊어진 상태로 메시지 전송 불가: userId={}", this.id);
         }
