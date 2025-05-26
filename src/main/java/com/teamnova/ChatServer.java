@@ -71,13 +71,8 @@ public class ChatServer {
     public void removeUser(User user) {
         int prevUserCount = userList.size();
 
-        if (user.socket != null) { 
-            try {
-                user.socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        // UserConnectionManager를 통해 연결 해제
+        user.disconnect();
 
         userList.remove(user);
         log.debug("id = {} / 접속종료, 접속자 수 : {} -> {}", user.id, prevUserCount,

@@ -1,10 +1,7 @@
 
 package com.teamnova;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -17,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import com.teamnova.Utils.TimeUtils;
 import com.teamnova.command.Action;
 import com.teamnova.command.BaseCommand;
@@ -51,9 +47,9 @@ public class User extends Thread {
     long id;
 
     ChatServer server;
-    Socket socket;
-    BufferedReader in;
-    PrintWriter out;
+
+    // 연결 관리자
+    private UserConnectionManager connectionManager;
 
     // 소켓 접속이 안 된사이 쌓인 메시지 저장 큐
     Queue<String> messageQueue = new LinkedList<>();
@@ -61,43 +57,36 @@ public class User extends Thread {
     // 방에 초대했지만 현재 접속하지 않은경우를 대처하기 위한 생성자
     public User(long id) {
         this.id = id;
+        this.connectionManager = new UserConnectionManager(null, id);
     }
 
     // 사용자가 실제 접속했을 때 사용되는 생성자
     public User(ChatServer server, Socket socket) {
         this.server = server;
-        this.socket = socket;
-
-        try {
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.connectionManager = new UserConnectionManager(socket, 0); // ID는 나중에 설정됨
     }
 
     // 소켓 교체
     public void replaceSocket(Socket socket) {
         log.debug("id = {} 의 소켓을 새것으로 교체", id);
+        connectionManager.replaceSocket(socket);
+    }
 
-        this.socket = socket;
-        try {
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    // 연결 해제
+    public void disconnect() {
+        log.debug("사용자 ID={} 연결 해제", id);
+        connectionManager.disconnect();
     }
 
     @Override
     public void run() {
-        while (!socket.isClosed()) {
+        while (connectionManager.isConnected()) {
             try {
 
                 // 클라이언트로부터 받은 메시지 수신 대기 루프
                 while (true) {
 
-                    String line = in.readLine();
+                    String line = connectionManager.getInputStream().readLine();
                     log.debug("id={} 클라이언트로 부터 요청 받음 : {}", id, line);
 
                     if (line == null)
@@ -202,7 +191,7 @@ public class User extends Thread {
 
     }
 
-    public void getVideoRoomParticipant(GetVideoRoomParticipantCommand command){
+    public void getVideoRoomParticipant(GetVideoRoomParticipantCommand command) {
         log.debug("getVideoRoomParticipant() - START");
 
         VideoRoom videoRoom = ChatServer.videoRoomMap.get(command.videoRoomId);
@@ -749,8 +738,12 @@ public class User extends Thread {
             command.id = insertedId;
         }
 
-        out.println(command.toJson());
-        log.debug("보낸 메시지 내용 : {}", command.toJson());
+        if (connectionManager.isConnected()) {
+            connectionManager.getOutputStream().println(command.toJson());
+            log.debug("보낸 메시지 내용 : {}", command.toJson());
+        } else {
+            log.debug("연결이 끊어진 상태로 메시지 전송 불가: userId={}", this.id);
+        }
 
         log.debug("sendMsg: END");
     }
