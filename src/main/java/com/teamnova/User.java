@@ -33,7 +33,10 @@ import com.teamnova.command.SDPCommand;
 import com.teamnova.command.SendMessageCommand;
 
 /**
- * 유저 클래스
+ * 사용자 클래스 - 리팩토링을 통해 3개 핸들러로 책임 분리
+ * - UserConnectionManager: 연결 관리
+ * - MessageHandler: 메시지 처리
+ * - WebRTCSignalingHandler: WebRTC 시그널링
  */
 public class User extends Thread {
 
