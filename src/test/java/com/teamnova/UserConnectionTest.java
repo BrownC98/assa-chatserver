@@ -9,6 +9,9 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.teamnova.server.ChatServer;
+import com.teamnova.user.User;
+
 /**
  * 사용자 연결 관리 기능 테스트
  */

@@ -8,6 +8,9 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.teamnova.server.ChatServer;
+import com.teamnova.user.User;
+
 /**
  * WebRTC 시그널링 기능 테스트
  */

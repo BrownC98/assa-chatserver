@@ -8,8 +8,10 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.teamnova.command.CreateRoomCommand;
-import com.teamnova.command.SendMessageCommand;
+import com.teamnova.command.chat.CreateRoomCommand;
+import com.teamnova.command.chat.SendMessageCommand;
+import com.teamnova.server.ChatServer;
+import com.teamnova.user.User;
 
 /**
  * 메시지 송수신 기능 테스트

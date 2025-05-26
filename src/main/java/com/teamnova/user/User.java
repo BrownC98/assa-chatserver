@@ -1,5 +1,5 @@
 
-package com.teamnova;
+package com.teamnova.user;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -13,6 +13,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.teamnova.chat.ChatRoom;
+import com.teamnova.chat.MessageHandler;
 import com.teamnova.command.Action;
 import com.teamnova.command.BaseCommand;
 import com.teamnova.command.ResponseCommand;
@@ -30,7 +32,10 @@ import com.teamnova.command.webrtc.IceCandidateCommand;
 import com.teamnova.command.webrtc.JoinVideoRoomCommand;
 import com.teamnova.command.webrtc.MediaStatusCommand;
 import com.teamnova.command.webrtc.SDPCommand;
+import com.teamnova.database.DBHelper;
+import com.teamnova.server.ChatServer;
 import com.teamnova.utils.TimeUtils;
+import com.teamnova.webrtc.WebRTCSignalingHandler;
 
 /**
  * 사용자 클래스 - 리팩토링을 통해 3개 핸들러로 책임 분리
@@ -42,21 +47,21 @@ public class User extends Thread {
 
     private static Logger log = LogManager.getLogger(User.class.getName());
 
-    long id;
+    public long id;
 
-    ChatServer server;
+    public ChatServer server;
 
     // 연결 관리자
     private UserConnectionManager connectionManager;
 
     // 메시지 처리자
-    MessageHandler messageHandler;
+    public MessageHandler messageHandler;
 
     // WebRTC 시그널링 처리자
     private WebRTCSignalingHandler webrtcHandler;
 
     // 소켓 접속이 안 된사이 쌓인 메시지 저장 큐
-    Queue<String> messageQueue = new LinkedList<>();
+    public Queue<String> messageQueue = new LinkedList<>();
 
     // 방에 초대했지만 현재 접속하지 않은경우를 대처하기 위한 생성자
     public User(long id) {

@@ -1,10 +1,12 @@
-package com.teamnova;
+package com.teamnova.webrtc;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import com.teamnova.user.User;
 
 public class VideoRoom {
 
@@ -19,15 +21,15 @@ public class VideoRoom {
         this.userList = new ArrayList<>();
     }
 
-    public void addUser(User user){
+    public void addUser(User user) {
         userList.add(user);
         // receivedIceCandidateMap.put(user.id, new ArrayList<Long>());
     }
 
-    public User getUserById(Long userId){
+    public User getUserById(Long userId) {
 
-        for(User user : userList){
-            if(user.id == userId){
+        for (User user : userList) {
+            if (user.id == userId) {
                 return user;
             }
         }

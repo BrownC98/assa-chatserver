@@ -1,4 +1,4 @@
-package com.teamnova;
+package com.teamnova.chat;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.teamnova.database.DBHelper;
 import com.teamnova.command.ResponseCommand.TransmissionStatus;
 import com.teamnova.command.chat.CheckReceiveCommand;
 import com.teamnova.command.chat.CreateRoomCommand;
@@ -18,6 +19,8 @@ import com.teamnova.command.chat.SendMessageCommand.MessageType;
 import com.teamnova.command.chat.SendMessageCommand.ReadStatus;
 import com.teamnova.dto.chat.RoomData;
 import com.teamnova.dto.user.UserData;
+import com.teamnova.server.ChatServer;
+import com.teamnova.user.User;
 
 /**
  * 메시지 처리를 담당하는 클래스

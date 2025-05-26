@@ -1,4 +1,4 @@
-package com.teamnova;
+package com.teamnova.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,6 +14,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.teamnova.chat.ChatRoom;
 import com.teamnova.command.Action;
 import com.teamnova.command.BaseCommand;
 import com.teamnova.command.ResponseCommand;
@@ -26,6 +27,7 @@ import com.teamnova.dto.chat.Message;
 import com.teamnova.dto.chat.MessageStatus;
 import com.teamnova.dto.chat.RoomData;
 import com.teamnova.dto.user.UserData;
+import com.teamnova.user.User;
 import com.teamnova.utils.TimeUtils;
 
 /**

@@ -1,4 +1,4 @@
-package com.teamnova;
+package com.teamnova.user;
 
 import java.io.BufferedReader;
 import java.io.IOException;

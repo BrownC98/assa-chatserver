@@ -1,4 +1,4 @@
-package com.teamnova;
+package com.teamnova.chat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,9 +7,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.teamnova.webrtc.VideoRoom;
 import com.teamnova.command.ResponseCommand;
 import com.teamnova.command.ResponseCommand.TransmissionStatus;
 import com.teamnova.command.chat.CreateRoomCommand.RoomType;
+import com.teamnova.user.User;
 
 /**
  * 채팅방 클래스

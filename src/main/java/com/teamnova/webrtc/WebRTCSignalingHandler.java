@@ -1,4 +1,4 @@
-package com.teamnova;
+package com.teamnova.webrtc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.teamnova.database.DBHelper;
 import com.teamnova.command.chat.SendMessageCommand;
 import com.teamnova.command.chat.SendMessageCommand.MessageType;
 import com.teamnova.command.chat.SendMessageCommand.ReadStatus;
@@ -17,6 +18,8 @@ import com.teamnova.command.webrtc.JoinVideoRoomCommand;
 import com.teamnova.command.webrtc.MediaStatusCommand;
 import com.teamnova.command.webrtc.SDPCommand;
 import com.teamnova.dto.user.UserData;
+import com.teamnova.server.ChatServer;
+import com.teamnova.user.User;
 
 /**
  * WebRTC 시그널링 처리를 담당하는 클래스
