@@ -1,6 +1,6 @@
-package com.teamnova.dto;
+package com.teamnova.dto.user;
 
-import com.teamnova.UserData;
+import com.teamnova.dto.user.UserData;
 
 public class Member {
     public Long roomId;

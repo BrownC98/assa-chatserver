@@ -2,7 +2,7 @@ package com.teamnova.command;
 
 import java.util.List;
 
-import com.teamnova.UserData;
+import com.teamnova.dto.user.UserData;
 
 /**
  * 영상통화 방 참가 요청 커맨드

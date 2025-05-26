@@ -16,6 +16,7 @@ import com.teamnova.command.SDPCommand;
 import com.teamnova.command.SendMessageCommand;
 import com.teamnova.command.SendMessageCommand.MessageType;
 import com.teamnova.command.SendMessageCommand.ReadStatus;
+import com.teamnova.dto.user.UserData;
 
 /**
  * WebRTC 시그널링 처리를 담당하는 클래스

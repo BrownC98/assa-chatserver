@@ -83,77 +83,77 @@
 
 ### 2.1 utils 패키지 생성 및 이동
 
-- [ ] **utils 패키지 생성** (소문자로 변경)
+- [x] **utils 패키지 생성** (소문자로 변경)
 
   ```bash
   mkdir -p src/main/java/com/teamnova/utils
   ```
 
-- [ ] **기존 Utils 클래스들 이동**
+- [x] **기존 Utils 클래스들 이동**
 
-  - [ ] `Utils/TimeUtils.java` → `utils/TimeUtils.java`
+  - [x] `Utils/TimeUtils.java` → `utils/TimeUtils.java`
     ```bash
     git mv src/main/java/com/teamnova/Utils/TimeUtils.java src/main/java/com/teamnova/utils/TimeUtils.java
     ```
-  - [ ] `Utils/Log.java` → `utils/LogUtils.java`
+  - [x] `Utils/Log.java` → `utils/LogUtils.java`
     ```bash
     git mv src/main/java/com/teamnova/Utils/Log.java src/main/java/com/teamnova/utils/LogUtils.java
     ```
-  - [ ] `Utils/Utils.java` → `utils/CommonUtils.java`
+  - [x] `Utils/Utils.java` → `utils/CommonUtils.java`
     ```bash
     git mv src/main/java/com/teamnova/Utils/Utils.java src/main/java/com/teamnova/utils/CommonUtils.java
     ```
 
-- [ ] **기존 Utils 디렉토리 삭제**
+- [x] **기존 Utils 디렉토리 삭제**
   ```bash
   rmdir src/main/java/com/teamnova/Utils
   ```
 
 ### 2.2 config 패키지 생성 및 이동
 
-- [ ] **config 패키지 생성**
+- [x] **config 패키지 생성**
 
   ```bash
   mkdir -p src/main/java/com/teamnova/config
   ```
 
-- [ ] **설정 관련 클래스 이동**
-  - [ ] `PropertiesManager.java` → `config/PropertiesManager.java`
+- [x] **설정 관련 클래스 이동**
+  - [x] `PropertiesManager.java` → `config/PropertiesManager.java`
     ```bash
     git mv src/main/java/com/teamnova/PropertiesManager.java src/main/java/com/teamnova/config/PropertiesManager.java
     ```
 
 ### 2.3 import 문 수정
 
-- [ ] **utils 패키지 import 문 수정**
+- [x] **utils 패키지 import 문 수정**
 
-  - [ ] TimeUtils를 사용하는 모든 클래스 수정
-  - [ ] LogUtils를 사용하는 모든 클래스 수정
-  - [ ] CommonUtils를 사용하는 모든 클래스 수정
+  - [x] TimeUtils를 사용하는 모든 클래스 수정
+  - [x] LogUtils를 사용하는 모든 클래스 수정
+  - [x] CommonUtils를 사용하는 모든 클래스 수정
 
-- [ ] **config 패키지 import 문 수정**
-  - [ ] PropertiesManager를 사용하는 모든 클래스 수정
+- [x] **config 패키지 import 문 수정**
+  - [x] PropertiesManager를 사용하는 모든 클래스 수정
 
 ### 2.4 컴파일 및 테스트
 
-- [ ] **컴파일 확인**
+- [x] **컴파일 확인**
   ```bash
   mvn compile
   ```
-- [ ] **컴파일 에러 수정** (있다면)
+- [x] **컴파일 에러 수정** (있다면)
 
-- [ ] **테스트 실행**
+- [x] **테스트 실행**
   ```bash
   mvn test
   ```
-- [ ] **테스트 실패 수정** (있다면)
+- [x] **테스트 실패 수정** (있다면)
 
 ### 🎯 Phase 2 완료 체크포인트 및 커밋
 
-- [ ] **utils, config 패키지 이동 완료**
-- [ ] **모든 import 문 수정 완료**
-- [ ] **컴파일 및 테스트 통과 확인**
-- [ ] **커밋 실행**
+- [x] **utils, config 패키지 이동 완료**
+- [x] **모든 import 문 수정 완료**
+- [x] **컴파일 및 테스트 통과 확인**
+- [x] **커밋 실행**
   ```bash
   git add .
   git commit -m "Phase 2 완료: utils, config 패키지 분리 - 유틸리티 및 설정 클래스 이동"

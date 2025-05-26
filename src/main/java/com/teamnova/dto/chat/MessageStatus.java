@@ -1,4 +1,4 @@
-package com.teamnova.dto;
+package com.teamnova.dto.chat;
 
 public class MessageStatus {
     public long id;
@@ -20,8 +20,8 @@ public class MessageStatus {
 
     // 상태값 enum
     public enum TYPE {
-        NOT_SENT,       // 전송 안 됨 (전송을 아직 안 했거나, 소켓이 없어 전송을 못한 경우 포함)
-        SENT,           // 전송됨 (안 읽음)
-        READ            // 수신자가 메시지를 읽음
+        NOT_SENT, // 전송 안 됨 (전송을 아직 안 했거나, 소켓이 없어 전송을 못한 경우 포함)
+        SENT, // 전송됨 (안 읽음)
+        READ // 수신자가 메시지를 읽음
     }
 }

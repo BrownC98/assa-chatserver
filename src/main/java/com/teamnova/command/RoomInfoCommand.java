@@ -2,7 +2,7 @@ package com.teamnova.command;
 
 import java.util.List;
 
-import com.teamnova.UserData;
+import com.teamnova.dto.user.UserData;
 import com.teamnova.command.CreateRoomCommand.RoomType;
 
 // 요청시 필요한 데이터 - roomId, 요청자

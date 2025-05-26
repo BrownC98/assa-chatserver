@@ -1,4 +1,4 @@
-package com.teamnova;
+package com.teamnova.dto.user;
 
 public class UserData {
     public long id;

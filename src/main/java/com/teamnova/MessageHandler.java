@@ -16,7 +16,8 @@ import com.teamnova.command.RoomInfoCommand;
 import com.teamnova.command.SendMessageCommand;
 import com.teamnova.command.SendMessageCommand.MessageType;
 import com.teamnova.command.SendMessageCommand.ReadStatus;
-import com.teamnova.dto.RoomData;
+import com.teamnova.dto.chat.RoomData;
+import com.teamnova.dto.user.UserData;
 
 /**
  * 메시지 처리를 담당하는 클래스

@@ -1,6 +1,6 @@
 package com.teamnova.command;
 
-import com.teamnova.SessionDescription;
+import com.teamnova.dto.webrtc.SessionDescription;
 
 public class SDPCommand extends ResponseCommand {
 

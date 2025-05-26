@@ -2,7 +2,7 @@ package com.teamnova.command;
 
 import java.util.List;
 
-import com.teamnova.UserData;
+import com.teamnova.dto.user.UserData;
 
 // 퇴장 요청시 필요한 데이터 - 방 id, 나가는 사람 id (요청자)
 // 남은 멤버가 받아야할 데이터 - 방 id, 메시지 id, 나가는 사람 id (요청자), 

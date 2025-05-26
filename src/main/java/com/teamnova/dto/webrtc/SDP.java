@@ -1,4 +1,4 @@
-package com.teamnova.dto;
+package com.teamnova.dto.webrtc;
 
 public class SDP {
     public String type;

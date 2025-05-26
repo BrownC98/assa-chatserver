@@ -22,9 +22,10 @@ import com.teamnova.command.ResponseCommand;
 import com.teamnova.command.ResponseCommand.TransmissionStatus;
 import com.teamnova.command.SendMessageCommand;
 import com.teamnova.config.PropertiesManager;
-import com.teamnova.dto.Message;
-import com.teamnova.dto.MessageStatus;
-import com.teamnova.dto.RoomData;
+import com.teamnova.dto.chat.Message;
+import com.teamnova.dto.chat.MessageStatus;
+import com.teamnova.dto.chat.RoomData;
+import com.teamnova.dto.user.UserData;
 import com.teamnova.utils.TimeUtils;
 
 /**

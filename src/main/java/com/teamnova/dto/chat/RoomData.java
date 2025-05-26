@@ -1,4 +1,4 @@
-package com.teamnova.dto;
+package com.teamnova.dto.chat;
 
 import com.teamnova.command.CreateRoomCommand.RoomType;
 

@@ -1,6 +1,6 @@
 package com.teamnova.command;
 
-import com.teamnova.IceCandidate;
+import com.teamnova.dto.webrtc.IceCandidate;
 
 public class IceCandidateCommand extends ResponseCommand {
 
