@@ -298,7 +298,7 @@ public class User extends Thread {
 
         if (connectionManager.isConnected()) {
             connectionManager.getOutputStream().println(command.toJson());
-            log.debug("보낸 메시지 내용 : {}", command.toJson());
+        log.debug("보낸 메시지 내용 : {}", command.toJson());
         } else {
             log.debug("연결이 끊어진 상태로 메시지 전송 불가: userId={}", this.id);
         }

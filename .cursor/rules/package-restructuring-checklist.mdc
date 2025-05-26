@@ -1,0 +1,743 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# ASSA Chat Server 패키지 구조 개선 체크리스트
+
+## 📋 작업 개요
+
+- **목표**: 현재 혼재된 패키지 구조를 논리적이고 확장 가능한 구조로 개선
+- **시간**: 1일(8시간) 내 완료
+- **방법**: 점진적 패키지 이동 + 테스트 기반 안전한 리팩토링
+- **핵심**: 기존 기능 100% 유지 + 명확한 책임 분리
+
+---
+
+## 🕘 Phase 1: 준비 및 분석 (1시간) - 09:00~10:00
+
+### 1.1 현재 상태 백업 및 분석
+
+- [ ] **Git 상태 확인**
+  ```bash
+  git status
+  git log --oneline -5
+  ```
+- [ ] **현재 코드 백업 커밋**
+  ```bash
+  git add .
+  git commit -m "패키지 구조 개선 시작 전 백업 - 현재 구조 보존"
+  ```
+
+### 1.2 현재 패키지 구조 문서화
+
+- [ ] **루트 패키지 클래스 목록 작성**
+
+  - [ ] User.java (308줄) 확인
+  - [ ] UserConnectionManager.java (143줄) 확인
+  - [ ] MessageHandler.java (348줄) 확인
+  - [ ] WebRTCSignalingHandler.java (221줄) 확인
+  - [ ] ChatServer.java (82줄) 확인
+  - [ ] DBHelper.java (728줄) 확인
+  - [ ] 기타 루트 클래스들 확인
+
+- [ ] **기존 패키지 구조 분석**
+  - [ ] command/ 패키지 내 18개 Command 클래스 확인
+  - [ ] dto/ 패키지 내 5개 DTO 클래스 확인
+  - [ ] Utils/ 패키지 내 3개 유틸 클래스 확인
+
+### 1.3 의존성 관계 파악
+
+- [ ] **import 문 분석**
+
+  - [ ] User.java의 import 문 확인
+  - [ ] MessageHandler.java의 import 문 확인
+  - [ ] WebRTCSignalingHandler.java의 import 문 확인
+  - [ ] Command 클래스들의 import 문 확인
+
+- [ ] **순환 참조 확인**
+  - [ ] User ↔ MessageHandler 관계 확인
+  - [ ] User ↔ WebRTCSignalingHandler 관계 확인
+  - [ ] Command 클래스들 간 의존성 확인
+
+### 1.4 테스트 환경 확인
+
+- [ ] **기존 테스트 실행**
+  ```bash
+  mvn test
+  ```
+- [ ] **테스트 결과 확인**
+
+  - [ ] 모든 테스트 통과 확인
+  - [ ] 실패한 테스트 있다면 기록
+
+- [ ] **빌드 환경 검증**
+  ```bash
+  mvn compile
+  ```
+
+### 🎯 Phase 1 완료 체크포인트
+
+- [ ] **분석 결과 문서화 완료**
+- [ ] **백업 커밋 완료**
+- [ ] **테스트 환경 정상 동작 확인**
+
+---
+
+## 🕙 Phase 2: 유틸리티 및 설정 패키지 정리 (1시간) - 10:00~11:00
+
+### 2.1 utils 패키지 생성 및 이동
+
+- [ ] **utils 패키지 생성** (소문자로 변경)
+
+  ```bash
+  mkdir -p src/main/java/com/teamnova/utils
+  ```
+
+- [ ] **기존 Utils 클래스들 이동**
+
+  - [ ] `Utils/TimeUtils.java` → `utils/TimeUtils.java`
+    ```bash
+    git mv src/main/java/com/teamnova/Utils/TimeUtils.java src/main/java/com/teamnova/utils/TimeUtils.java
+    ```
+  - [ ] `Utils/Log.java` → `utils/LogUtils.java`
+    ```bash
+    git mv src/main/java/com/teamnova/Utils/Log.java src/main/java/com/teamnova/utils/LogUtils.java
+    ```
+  - [ ] `Utils/Utils.java` → `utils/CommonUtils.java`
+    ```bash
+    git mv src/main/java/com/teamnova/Utils/Utils.java src/main/java/com/teamnova/utils/CommonUtils.java
+    ```
+
+- [ ] **기존 Utils 디렉토리 삭제**
+  ```bash
+  rmdir src/main/java/com/teamnova/Utils
+  ```
+
+### 2.2 config 패키지 생성 및 이동
+
+- [ ] **config 패키지 생성**
+
+  ```bash
+  mkdir -p src/main/java/com/teamnova/config
+  ```
+
+- [ ] **설정 관련 클래스 이동**
+  - [ ] `PropertiesManager.java` → `config/PropertiesManager.java`
+    ```bash
+    git mv src/main/java/com/teamnova/PropertiesManager.java src/main/java/com/teamnova/config/PropertiesManager.java
+    ```
+
+### 2.3 import 문 수정
+
+- [ ] **utils 패키지 import 문 수정**
+
+  - [ ] TimeUtils를 사용하는 모든 클래스 수정
+  - [ ] LogUtils를 사용하는 모든 클래스 수정
+  - [ ] CommonUtils를 사용하는 모든 클래스 수정
+
+- [ ] **config 패키지 import 문 수정**
+  - [ ] PropertiesManager를 사용하는 모든 클래스 수정
+
+### 2.4 컴파일 및 테스트
+
+- [ ] **컴파일 확인**
+  ```bash
+  mvn compile
+  ```
+- [ ] **컴파일 에러 수정** (있다면)
+
+- [ ] **테스트 실행**
+  ```bash
+  mvn test
+  ```
+- [ ] **테스트 실패 수정** (있다면)
+
+### 🎯 Phase 2 완료 체크포인트 및 커밋
+
+- [ ] **utils, config 패키지 이동 완료**
+- [ ] **모든 import 문 수정 완료**
+- [ ] **컴파일 및 테스트 통과 확인**
+- [ ] **커밋 실행**
+  ```bash
+  git add .
+  git commit -m "Phase 2 완료: utils, config 패키지 분리 - 유틸리티 및 설정 클래스 이동"
+  ```
+
+---
+
+## 🕐 Phase 3: DTO 패키지 구조화 (1시간) - 11:00~12:00
+
+### 3.1 DTO 하위 패키지 생성
+
+- [ ] **기능별 DTO 패키지 생성**
+  ```bash
+  mkdir -p src/main/java/com/teamnova/dto/chat
+  mkdir -p src/main/java/com/teamnova/dto/webrtc
+  mkdir -p src/main/java/com/teamnova/dto/user
+  ```
+
+### 3.2 채팅 관련 DTO 이동
+
+- [ ] **채팅 관련 DTO 클래스 이동**
+  - [ ] `dto/Message.java` → `dto/chat/Message.java`
+    ```bash
+    git mv src/main/java/com/teamnova/dto/Message.java src/main/java/com/teamnova/dto/chat/Message.java
+    ```
+  - [ ] `dto/RoomData.java` → `dto/chat/RoomData.java`
+    ```bash
+    git mv src/main/java/com/teamnova/dto/RoomData.java src/main/java/com/teamnova/dto/chat/RoomData.java
+    ```
+  - [ ] `dto/MessageStatus.java` → `dto/chat/MessageStatus.java`
+    ```bash
+    git mv src/main/java/com/teamnova/dto/MessageStatus.java src/main/java/com/teamnova/dto/chat/MessageStatus.java
+    ```
+
+### 3.3 WebRTC 관련 DTO 이동
+
+- [ ] **WebRTC 관련 DTO 클래스 이동**
+  - [ ] `dto/SDP.java` → `dto/webrtc/SDP.java`
+    ```bash
+    git mv src/main/java/com/teamnova/dto/SDP.java src/main/java/com/teamnova/dto/webrtc/SDP.java
+    ```
+  - [ ] `SessionDescription.java` → `dto/webrtc/SessionDescription.java`
+    ```bash
+    git mv src/main/java/com/teamnova/SessionDescription.java src/main/java/com/teamnova/dto/webrtc/SessionDescription.java
+    ```
+  - [ ] `IceCandidate.java` → `dto/webrtc/IceCandidate.java`
+    ```bash
+    git mv src/main/java/com/teamnova/IceCandidate.java src/main/java/com/teamnova/dto/webrtc/IceCandidate.java
+    ```
+
+### 3.4 사용자 관련 DTO 이동
+
+- [ ] **사용자 관련 DTO 클래스 이동**
+  - [ ] `dto/Member.java` → `dto/user/Member.java`
+    ```bash
+    git mv src/main/java/com/teamnova/dto/Member.java src/main/java/com/teamnova/dto/user/Member.java
+    ```
+  - [ ] `UserData.java` → `dto/user/UserData.java`
+    ```bash
+    git mv src/main/java/com/teamnova/UserData.java src/main/java/com/teamnova/dto/user/UserData.java
+    ```
+
+### 3.5 import 문 수정
+
+- [ ] **채팅 DTO import 문 수정**
+
+  - [ ] Message 클래스를 사용하는 모든 클래스 수정
+  - [ ] RoomData 클래스를 사용하는 모든 클래스 수정
+  - [ ] MessageStatus 클래스를 사용하는 모든 클래스 수정
+
+- [ ] **WebRTC DTO import 문 수정**
+
+  - [ ] SDP 클래스를 사용하는 모든 클래스 수정
+  - [ ] SessionDescription 클래스를 사용하는 모든 클래스 수정
+  - [ ] IceCandidate 클래스를 사용하는 모든 클래스 수정
+
+- [ ] **사용자 DTO import 문 수정**
+  - [ ] Member 클래스를 사용하는 모든 클래스 수정
+  - [ ] UserData 클래스를 사용하는 모든 클래스 수정
+
+### 3.6 컴파일 및 테스트
+
+- [ ] **컴파일 확인**
+  ```bash
+  mvn compile
+  ```
+- [ ] **컴파일 에러 수정** (있다면)
+
+- [ ] **테스트 실행**
+  ```bash
+  mvn test
+  ```
+- [ ] **테스트 실패 수정** (있다면)
+
+### 🎯 Phase 3 완료 체크포인트 및 커밋
+
+- [ ] **DTO 패키지 구조화 완료**
+- [ ] **모든 DTO 클래스 기능별 분리 완료**
+- [ ] **모든 import 문 수정 완료**
+- [ ] **컴파일 및 테스트 통과 확인**
+- [ ] **커밋 실행**
+  ```bash
+  git add .
+  git commit -m "Phase 3 완료: DTO 패키지 구조화 - 기능별 DTO 클래스 분리"
+  ```
+
+---
+
+## 🕐 점심시간 (1시간) - 12:00~13:00
+
+---
+
+## 🕐 Phase 4: Command 패키지 구조화 (1.5시간) - 13:00~14:30
+
+### 4.1 Command 하위 패키지 생성
+
+- [ ] **기능별 Command 패키지 생성**
+  ```bash
+  mkdir -p src/main/java/com/teamnova/command/chat
+  mkdir -p src/main/java/com/teamnova/command/webrtc
+  mkdir -p src/main/java/com/teamnova/command/user
+  ```
+
+### 4.2 채팅 관련 Command 이동
+
+- [ ] **채팅 관련 Command 클래스 이동**
+  - [ ] `command/CreateRoomCommand.java` → `command/chat/CreateRoomCommand.java`
+    ```bash
+    git mv src/main/java/com/teamnova/command/CreateRoomCommand.java src/main/java/com/teamnova/command/chat/CreateRoomCommand.java
+    ```
+  - [ ] `command/CreateOpenChatCommand.java` → `command/chat/CreateOpenChatCommand.java`
+    ```bash
+    git mv src/main/java/com/teamnova/command/CreateOpenChatCommand.java src/main/java/com/teamnova/command/chat/CreateOpenChatCommand.java
+    ```
+  - [ ] `command/SendMessageCommand.java` → `command/chat/SendMessageCommand.java`
+    ```bash
+    git mv src/main/java/com/teamnova/command/SendMessageCommand.java src/main/java/com/teamnova/command/chat/SendMessageCommand.java
+    ```
+  - [ ] `command/RoomInfoCommand.java` → `command/chat/RoomInfoCommand.java`
+    ```bash
+    git mv src/main/java/com/teamnova/command/RoomInfoCommand.java src/main/java/com/teamnova/command/chat/RoomInfoCommand.java
+    ```
+  - [ ] `command/ExitRoomCommand.java` → `command/chat/ExitRoomCommand.java`
+    ```bash
+    git mv src/main/java/com/teamnova/command/ExitRoomCommand.java src/main/java/com/teamnova/command/chat/ExitRoomCommand.java
+    ```
+  - [ ] `command/InviteCommand.java` → `command/chat/InviteCommand.java`
+    ```bash
+    git mv src/main/java/com/teamnova/command/InviteCommand.java src/main/java/com/teamnova/command/chat/InviteCommand.java
+    ```
+  - [ ] `command/CheckReceiveCommand.java` → `command/chat/CheckReceiveCommand.java`
+    ```bash
+    git mv src/main/java/com/teamnova/command/CheckReceiveCommand.java src/main/java/com/teamnova/command/chat/CheckReceiveCommand.java
+    ```
+
+### 4.3 WebRTC 관련 Command 이동
+
+- [ ] **WebRTC 관련 Command 클래스 이동**
+  - [ ] `command/CreateVideoRoomCommand.java` → `command/webrtc/CreateVideoRoomCommand.java`
+    ```bash
+    git mv src/main/java/com/teamnova/command/CreateVideoRoomCommand.java src/main/java/com/teamnova/command/webrtc/CreateVideoRoomCommand.java
+    ```
+  - [ ] `command/JoinVideoRoomCommand.java` → `command/webrtc/JoinVideoRoomCommand.java`
+    ```bash
+    git mv src/main/java/com/teamnova/command/JoinVideoRoomCommand.java src/main/java/com/teamnova/command/webrtc/JoinVideoRoomCommand.java
+    ```
+  - [ ] `command/ExitVideoRoomCommand.java` → `command/webrtc/ExitVideoRoomCommand.java`
+    ```bash
+    git mv src/main/java/com/teamnova/command/ExitVideoRoomCommand.java src/main/java/com/teamnova/command/webrtc/ExitVideoRoomCommand.java
+    ```
+  - [ ] `command/SDPCommand.java` → `command/webrtc/SDPCommand.java`
+    ```bash
+    git mv src/main/java/com/teamnova/command/SDPCommand.java src/main/java/com/teamnova/command/webrtc/SDPCommand.java
+    ```
+  - [ ] `command/IceCandidateCommand.java` → `command/webrtc/IceCandidateCommand.java`
+    ```bash
+    git mv src/main/java/com/teamnova/command/IceCandidateCommand.java src/main/java/com/teamnova/command/webrtc/IceCandidateCommand.java
+    ```
+  - [ ] `command/MediaStatusCommand.java` → `command/webrtc/MediaStatusCommand.java`
+    ```bash
+    git mv src/main/java/com/teamnova/command/MediaStatusCommand.java src/main/java/com/teamnova/command/webrtc/MediaStatusCommand.java
+    ```
+  - [ ] `command/GetVideoRoomParticipantCommand.java` → `command/webrtc/GetVideoRoomParticipantCommand.java`
+    ```bash
+    git mv src/main/java/com/teamnova/command/GetVideoRoomParticipantCommand.java src/main/java/com/teamnova/command/webrtc/GetVideoRoomParticipantCommand.java
+    ```
+
+### 4.4 사용자 관련 Command 이동
+
+- [ ] **사용자 관련 Command 클래스 이동**
+  - [ ] `command/ConnectCommand.java` → `command/user/ConnectCommand.java`
+    ```bash
+    git mv src/main/java/com/teamnova/command/ConnectCommand.java src/main/java/com/teamnova/command/user/ConnectCommand.java
+    ```
+
+### 4.5 공통 Command 확인 (루트 유지)
+
+- [ ] **공통 Command 클래스 확인**
+  - [ ] `command/Action.java` (루트 유지)
+  - [ ] `command/BaseCommand.java` (루트 유지)
+  - [ ] `command/ResponseCommand.java` (루트 유지)
+
+### 4.6 import 문 수정
+
+- [ ] **채팅 Command import 문 수정**
+
+  - [ ] Action.java에서 채팅 Command 클래스들 import 수정
+  - [ ] 기타 Command를 사용하는 클래스들 import 수정
+
+- [ ] **WebRTC Command import 문 수정**
+
+  - [ ] Action.java에서 WebRTC Command 클래스들 import 수정
+  - [ ] 기타 Command를 사용하는 클래스들 import 수정
+
+- [ ] **사용자 Command import 문 수정**
+  - [ ] Action.java에서 사용자 Command 클래스들 import 수정
+
+### 4.7 컴파일 및 테스트
+
+- [ ] **컴파일 확인**
+  ```bash
+  mvn compile
+  ```
+- [ ] **컴파일 에러 수정** (있다면)
+
+- [ ] **테스트 실행**
+  ```bash
+  mvn test
+  ```
+- [ ] **테스트 실패 수정** (있다면)
+
+### 🎯 Phase 4 완료 체크포인트 및 커밋
+
+- [ ] **Command 패키지 구조화 완료**
+- [ ] **모든 Command 클래스 기능별 분리 완료**
+- [ ] **모든 import 문 수정 완료**
+- [ ] **컴파일 및 테스트 통과 확인**
+- [ ] **커밋 실행**
+  ```bash
+  git add .
+  git commit -m "Phase 4 완료: Command 패키지 구조화 - 기능별 Command 클래스 분리"
+  ```
+
+---
+
+## 🕕 Phase 5: 핵심 비즈니스 로직 패키지화 (2시간) - 14:30~16:30
+
+### 5.1 server 패키지 생성 및 이동
+
+- [ ] **server 패키지 생성**
+
+  ```bash
+  mkdir -p src/main/java/com/teamnova/server
+  ```
+
+- [ ] **서버 관련 클래스 이동**
+  - [ ] `ChatServer.java` → `server/ChatServer.java`
+    ```bash
+    git mv src/main/java/com/teamnova/ChatServer.java src/main/java/com/teamnova/server/ChatServer.java
+    ```
+  - [ ] `Main.java` (루트 유지 - 진입점)
+
+### 5.2 user 패키지 생성 및 이동
+
+- [ ] **user 패키지 생성**
+
+  ```bash
+  mkdir -p src/main/java/com/teamnova/user
+  ```
+
+- [ ] **사용자 관련 클래스 이동**
+  - [ ] `User.java` → `user/User.java`
+    ```bash
+    git mv src/main/java/com/teamnova/User.java src/main/java/com/teamnova/user/User.java
+    ```
+  - [ ] `UserConnectionManager.java` → `user/UserConnectionManager.java`
+    ```bash
+    git mv src/main/java/com/teamnova/UserConnectionManager.java src/main/java/com/teamnova/user/UserConnectionManager.java
+    ```
+
+### 5.3 chat 패키지 생성 및 이동
+
+- [ ] **chat 패키지 생성**
+
+  ```bash
+  mkdir -p src/main/java/com/teamnova/chat
+  ```
+
+- [ ] **채팅 관련 클래스 이동**
+  - [ ] `ChatRoom.java` → `chat/ChatRoom.java`
+    ```bash
+    git mv src/main/java/com/teamnova/ChatRoom.java src/main/java/com/teamnova/chat/ChatRoom.java
+    ```
+  - [ ] `MessageHandler.java` → `chat/MessageHandler.java`
+    ```bash
+    git mv src/main/java/com/teamnova/MessageHandler.java src/main/java/com/teamnova/chat/MessageHandler.java
+    ```
+
+### 5.4 webrtc 패키지 생성 및 이동
+
+- [ ] **webrtc 패키지 생성**
+
+  ```bash
+  mkdir -p src/main/java/com/teamnova/webrtc
+  ```
+
+- [ ] **WebRTC 관련 클래스 이동**
+  - [ ] `VideoRoom.java` → `webrtc/VideoRoom.java`
+    ```bash
+    git mv src/main/java/com/teamnova/VideoRoom.java src/main/java/com/teamnova/webrtc/VideoRoom.java
+    ```
+  - [ ] `WebRTCSignalingHandler.java` → `webrtc/WebRTCSignalingHandler.java`
+    ```bash
+    git mv src/main/java/com/teamnova/WebRTCSignalingHandler.java src/main/java/com/teamnova/webrtc/WebRTCSignalingHandler.java
+    ```
+
+### 5.5 database 패키지 생성 및 이동
+
+- [ ] **database 패키지 생성**
+
+  ```bash
+  mkdir -p src/main/java/com/teamnova/database
+  ```
+
+- [ ] **데이터베이스 관련 클래스 이동**
+  - [ ] `DBHelper.java` → `database/DBHelper.java`
+    ```bash
+    git mv src/main/java/com/teamnova/DBHelper.java src/main/java/com/teamnova/database/DBHelper.java
+    ```
+
+### 5.6 핵심 클래스들 import 문 수정
+
+- [ ] **server 패키지 import 문 수정**
+
+  - [ ] Main.java에서 ChatServer import 수정
+  - [ ] ChatServer를 사용하는 다른 클래스들 import 수정
+
+- [ ] **user 패키지 import 문 수정**
+
+  - [ ] User 클래스를 사용하는 모든 클래스 import 수정
+  - [ ] UserConnectionManager를 사용하는 모든 클래스 import 수정
+  - [ ] Command 클래스들에서 User import 수정
+
+- [ ] **chat 패키지 import 문 수정**
+
+  - [ ] ChatRoom을 사용하는 모든 클래스 import 수정
+  - [ ] MessageHandler를 사용하는 모든 클래스 import 수정
+  - [ ] User 클래스에서 MessageHandler import 수정
+
+- [ ] **webrtc 패키지 import 문 수정**
+
+  - [ ] VideoRoom을 사용하는 모든 클래스 import 수정
+  - [ ] WebRTCSignalingHandler를 사용하는 모든 클래스 import 수정
+  - [ ] User 클래스에서 WebRTCSignalingHandler import 수정
+
+- [ ] **database 패키지 import 문 수정**
+  - [ ] DBHelper를 사용하는 모든 클래스 import 수정
+
+### 5.7 컴파일 및 테스트 (중간 체크)
+
+- [ ] **컴파일 확인**
+  ```bash
+  mvn compile
+  ```
+- [ ] **컴파일 에러 수정** (있다면)
+
+- [ ] **테스트 실행**
+  ```bash
+  mvn test
+  ```
+- [ ] **테스트 실패 수정** (있다면)
+
+### 🎯 Phase 5 완료 체크포인트 및 커밋
+
+- [ ] **핵심 비즈니스 로직 패키지화 완료**
+- [ ] **server, user, chat, webrtc, database 패키지 분리 완료**
+- [ ] **모든 import 문 수정 완료**
+- [ ] **컴파일 및 테스트 통과 확인**
+- [ ] **커밋 실행**
+  ```bash
+  git add .
+  git commit -m "Phase 5 완료: 핵심 비즈니스 로직 패키지화 - server, user, chat, webrtc, database 분리"
+  ```
+
+---
+
+## 🕕 Phase 6: 의존성 정리 및 최종 검증 (1.5시간) - 16:30~18:00
+
+### 6.1 전체 import 문 정리
+
+- [ ] **모든 클래스의 import 문 최종 검토**
+  - [ ] Main.java import 문 정리
+  - [ ] server 패키지 클래스들 import 문 정리
+  - [ ] user 패키지 클래스들 import 문 정리
+  - [ ] chat 패키지 클래스들 import 문 정리
+  - [ ] webrtc 패키지 클래스들 import 문 정리
+  - [ ] database 패키지 클래스들 import 문 정리
+  - [ ] command 패키지 클래스들 import 문 정리
+  - [ ] dto 패키지 클래스들 import 문 정리
+  - [ ] config 패키지 클래스들 import 문 정리
+  - [ ] utils 패키지 클래스들 import 문 정리
+
+### 6.2 순환 참조 해결
+
+- [ ] **순환 참조 확인 및 해결**
+  - [ ] User ↔ MessageHandler 순환 참조 확인
+  - [ ] User ↔ WebRTCSignalingHandler 순환 참조 확인
+  - [ ] Command 클래스들 간 순환 참조 확인
+  - [ ] 발견된 순환 참조 해결
+
+### 6.3 불필요한 import 제거
+
+- [ ] **사용하지 않는 import 문 제거**
+  - [ ] IDE 또는 도구를 사용하여 불필요한 import 제거
+  - [ ] 각 패키지별로 import 문 정리
+
+### 6.4 패키지 정보 파일 생성
+
+- [ ] **각 패키지에 package-info.java 생성**
+  - [ ] `server/package-info.java` 생성
+    ```java
+    /**
+     * 서버 시작/종료, 클라이언트 연결 수락 관련 클래스들
+     */
+    package com.teamnova.server;
+    ```
+  - [ ] `user/package-info.java` 생성
+    ```java
+    /**
+     * 사용자 생명주기 관리, 연결 상태 관리 관련 클래스들
+     */
+    package com.teamnova.user;
+    ```
+  - [ ] `chat/package-info.java` 생성
+    ```java
+    /**
+     * 채팅방 관리, 메시지 처리 관련 클래스들
+     */
+    package com.teamnova.chat;
+    ```
+  - [ ] `webrtc/package-info.java` 생성
+    ```java
+    /**
+     * WebRTC 시그널링, 영상방 관리 관련 클래스들
+     */
+    package com.teamnova.webrtc;
+    ```
+  - [ ] `database/package-info.java` 생성
+    ```java
+    /**
+     * 데이터베이스 연결, 쿼리 실행 관련 클래스들
+     */
+    package com.teamnova.database;
+    ```
+  - [ ] `config/package-info.java` 생성
+    ```java
+    /**
+     * 설정 관리, 환경 변수 처리 관련 클래스들
+     */
+    package com.teamnova.config;
+    ```
+  - [ ] `utils/package-info.java` 생성
+    ```java
+    /**
+     * 공통 유틸리티 기능 관련 클래스들
+     */
+    package com.teamnova.utils;
+    ```
+
+### 6.5 최종 컴파일 및 테스트
+
+- [ ] **전체 클린 빌드**
+  ```bash
+  mvn clean compile
+  ```
+- [ ] **컴파일 에러 최종 확인 및 수정**
+
+- [ ] **전체 테스트 실행**
+  ```bash
+  mvn test
+  ```
+- [ ] **테스트 실패 최종 확인 및 수정**
+
+### 6.6 기능 동작 확인
+
+- [ ] **서버 실행 테스트**
+  ```bash
+  mvn exec:java -Dexec.mainClass="com.teamnova.Main"
+  ```
+- [ ] **기본 기능 동작 확인**
+  - [ ] 서버 시작 확인
+  - [ ] 포트 바인딩 확인
+  - [ ] 로그 출력 확인
+
+### 6.7 문서화 업데이트
+
+- [ ] **README.md 업데이트**
+
+  - [ ] 새로운 패키지 구조 반영
+  - [ ] 빌드 및 실행 방법 업데이트
+
+- [ ] **패키지 구조 문서 작성**
+  - [ ] 각 패키지별 책임 명시
+  - [ ] 의존성 관계 다이어그램 작성 (선택사항)
+
+### 🎯 최종 커밋
+
+- [ ] **최종 정리 커밋**
+  ```bash
+  git add .
+  git commit -m "Phase 6 완료: 패키지 구조 개선 최종 완료 - 의존성 정리 및 문서화"
+  ```
+
+---
+
+## 📊 성공 기준 최종 체크
+
+### ✅ 최소 성공 기준 (반드시 달성)
+
+- [ ] 기존 기능 100% 동작
+- [ ] 컴파일 에러 없음
+- [ ] 최소 5개 패키지 분리 완료 (utils, config, dto, command, 핵심 로직 1개)
+- [ ] 순환 참조 해결
+
+### 🎯 이상적 성공 기준 (목표)
+
+- [ ] 8개 패키지 모두 분리 완료 (server, user, chat, webrtc, database, command, dto, config, utils)
+- [ ] package-info.java 작성 완료
+- [ ] 의존성 관계 명확화
+- [ ] 문서화 완료
+
+### 📈 최종 결과 확인
+
+- [ ] **패키지 구조 개선 전후 비교**
+
+  - [ ] 이전: 루트에 혼재된 구조
+  - [ ] 이후: 기능별 명확한 패키지 분리
+
+- [ ] **코드 품질 개선 확인**
+  - [ ] 책임 분리 명확화
+  - [ ] 확장성 향상
+  - [ ] 테스트 용이성 개선
+
+---
+
+## 🚨 문제 발생 시 대응 가이드
+
+### 컴파일 에러 발생 시
+
+1. **즉시 이전 커밋으로 롤백**
+   ```bash
+   git reset --hard HEAD~1
+   ```
+2. **문제 원인 파악 후 다시 시도**
+3. **시간이 부족하면 해당 Phase 스킵**
+
+### 테스트 실패 시
+
+1. **실패한 기능만 원복**
+2. **나머지 작업 계속 진행**
+3. **최종 커밋 전 반드시 해결**
+
+### 시간 초과 시
+
+1. **완료된 Phase만 커밋**
+2. **미완료 작업은 다음 기회로 연기**
+3. **최소 성공 기준 달성 여부 확인**
+
+### 우선순위 (시간 부족 시)
+
+1. **1순위**: utils, config (독립적)
+2. **2순위**: dto (의존성 적음)
+3. **3순위**: command (구조화 효과 큼)
+4. **4순위**: 핵심 비즈니스 로직 (user, chat, webrtc)
+
+---
+
+**🎯 목표**: 논리적이고 확장 가능한 패키지 구조 구축  
+**🔑 핵심**: 기능별 명확한 책임 분리 + 의존성 최소화  
+**🛠️ 방법**: 점진적 이동 + 테스트 기반 안전한 리팩토링
+
+> ⚡ **완벽한 구조보다는 실용적인 개선**을 목표로, 1일 내에 실질적인 패키지 구조 개선을 달성합니다!
