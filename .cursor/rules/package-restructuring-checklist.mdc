@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: true
+alwaysApply: false
 ---
 # ASSA Chat Server 패키지 구조 개선 체크리스트
 
