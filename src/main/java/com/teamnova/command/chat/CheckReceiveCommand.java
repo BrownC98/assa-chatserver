@@ -1,4 +1,7 @@
-package com.teamnova.command;
+package com.teamnova.command.chat;
+
+import com.teamnova.command.Action;
+import com.teamnova.command.BaseCommand;
 
 /**
  * 클라이언트로 부터 수신확인 받는 커맨드

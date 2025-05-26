@@ -6,16 +6,16 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.teamnova.command.CreateVideoRoomCommand;
-import com.teamnova.command.ExitVideoRoomCommand;
-import com.teamnova.command.GetVideoRoomParticipantCommand;
-import com.teamnova.command.IceCandidateCommand;
-import com.teamnova.command.JoinVideoRoomCommand;
-import com.teamnova.command.MediaStatusCommand;
-import com.teamnova.command.SDPCommand;
-import com.teamnova.command.SendMessageCommand;
-import com.teamnova.command.SendMessageCommand.MessageType;
-import com.teamnova.command.SendMessageCommand.ReadStatus;
+import com.teamnova.command.chat.SendMessageCommand;
+import com.teamnova.command.chat.SendMessageCommand.MessageType;
+import com.teamnova.command.chat.SendMessageCommand.ReadStatus;
+import com.teamnova.command.webrtc.CreateVideoRoomCommand;
+import com.teamnova.command.webrtc.ExitVideoRoomCommand;
+import com.teamnova.command.webrtc.GetVideoRoomParticipantCommand;
+import com.teamnova.command.webrtc.IceCandidateCommand;
+import com.teamnova.command.webrtc.JoinVideoRoomCommand;
+import com.teamnova.command.webrtc.MediaStatusCommand;
+import com.teamnova.command.webrtc.SDPCommand;
 import com.teamnova.dto.user.UserData;
 
 /**

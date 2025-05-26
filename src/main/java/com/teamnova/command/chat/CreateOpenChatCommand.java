@@ -1,4 +1,7 @@
-package com.teamnova.command;
+package com.teamnova.command.chat;
+
+import com.teamnova.command.Action;
+import com.teamnova.command.BaseCommand;
 
 public class CreateOpenChatCommand extends BaseCommand {
 

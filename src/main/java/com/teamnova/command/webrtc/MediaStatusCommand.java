@@ -1,4 +1,7 @@
-package com.teamnova.command;
+package com.teamnova.command.webrtc;
+
+import com.teamnova.command.Action;
+import com.teamnova.command.ResponseCommand;
 
 /**
  * 영상회의중 카메라, 마이크 on / off 상태를 전달하기 위한 커맨드
@@ -16,8 +19,8 @@ public class MediaStatusCommand extends ResponseCommand {
         this.mediaType = mediaType;
     }
 
-    public static RoomInfoCommand fromJson(String json) throws Exception {
-        return fromJson(json, RoomInfoCommand.class);
+    public static MediaStatusCommand fromJson(String json) throws Exception {
+        return fromJson(json, MediaStatusCommand.class);
     }
 
     public enum MediaType {

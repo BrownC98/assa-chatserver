@@ -7,15 +7,15 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.teamnova.command.CheckReceiveCommand;
-import com.teamnova.command.CreateRoomCommand;
-import com.teamnova.command.ExitRoomCommand;
-import com.teamnova.command.InviteCommand;
 import com.teamnova.command.ResponseCommand.TransmissionStatus;
-import com.teamnova.command.RoomInfoCommand;
-import com.teamnova.command.SendMessageCommand;
-import com.teamnova.command.SendMessageCommand.MessageType;
-import com.teamnova.command.SendMessageCommand.ReadStatus;
+import com.teamnova.command.chat.CheckReceiveCommand;
+import com.teamnova.command.chat.CreateRoomCommand;
+import com.teamnova.command.chat.ExitRoomCommand;
+import com.teamnova.command.chat.InviteCommand;
+import com.teamnova.command.chat.RoomInfoCommand;
+import com.teamnova.command.chat.SendMessageCommand;
+import com.teamnova.command.chat.SendMessageCommand.MessageType;
+import com.teamnova.command.chat.SendMessageCommand.ReadStatus;
 import com.teamnova.dto.chat.RoomData;
 import com.teamnova.dto.user.UserData;
 

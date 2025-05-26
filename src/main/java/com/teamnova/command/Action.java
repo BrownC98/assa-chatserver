@@ -1,5 +1,21 @@
 package com.teamnova.command;
 
+import com.teamnova.command.chat.CheckReceiveCommand;
+import com.teamnova.command.chat.CreateOpenChatCommand;
+import com.teamnova.command.chat.CreateRoomCommand;
+import com.teamnova.command.chat.ExitRoomCommand;
+import com.teamnova.command.chat.InviteCommand;
+import com.teamnova.command.chat.RoomInfoCommand;
+import com.teamnova.command.chat.SendMessageCommand;
+import com.teamnova.command.user.ConnectCommand;
+import com.teamnova.command.webrtc.CreateVideoRoomCommand;
+import com.teamnova.command.webrtc.ExitVideoRoomCommand;
+import com.teamnova.command.webrtc.GetVideoRoomParticipantCommand;
+import com.teamnova.command.webrtc.IceCandidateCommand;
+import com.teamnova.command.webrtc.JoinVideoRoomCommand;
+import com.teamnova.command.webrtc.MediaStatusCommand;
+import com.teamnova.command.webrtc.SDPCommand;
+
 public enum Action {
     CONNECT(ConnectCommand.class), // 소켓 접속
     DISCONNECT(null),

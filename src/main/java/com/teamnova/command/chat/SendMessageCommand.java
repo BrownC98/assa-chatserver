@@ -1,7 +1,10 @@
-package com.teamnova.command;
+package com.teamnova.command.chat;
+
+import com.teamnova.command.Action;
+import com.teamnova.command.ResponseCommand;
 
 public class SendMessageCommand extends ResponseCommand {
-    
+
     public Long messageId;
     public Long roomId;
     public String content;

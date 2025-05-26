@@ -1,6 +1,9 @@
-package com.teamnova.command;
+package com.teamnova.command.chat;
 
 import java.util.List;
+
+import com.teamnova.command.Action;
+import com.teamnova.command.BaseCommand;
 
 public class CreateRoomCommand extends BaseCommand {
 
@@ -25,7 +28,7 @@ public class CreateRoomCommand extends BaseCommand {
         return fromJson(json, CreateRoomCommand.class);
     }
 
-    public enum RoomType{
+    public enum RoomType {
         NORMAL,
         OPEN
     }

@@ -1,10 +1,13 @@
-package com.teamnova.command;
+package com.teamnova.command.webrtc;
+
+import com.teamnova.command.Action;
+import com.teamnova.command.ResponseCommand;
 
 public class ExitVideoRoomCommand extends ResponseCommand {
 
     public Boolean isHost;
     public String videoRoomId;
-    public Long roomId;  
+    public Long roomId;
 
     public ExitVideoRoomCommand() {
         super(Action.EXIT_VIDEO_ROOM, 0L);
@@ -14,4 +17,3 @@ public class ExitVideoRoomCommand extends ResponseCommand {
         return fromJson(json, ExitVideoRoomCommand.class);
     }
 }
-

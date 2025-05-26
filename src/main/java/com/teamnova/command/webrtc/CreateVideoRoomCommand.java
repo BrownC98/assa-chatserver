@@ -1,4 +1,7 @@
-package com.teamnova.command;
+package com.teamnova.command.webrtc;
+
+import com.teamnova.command.Action;
+import com.teamnova.command.ResponseCommand;
 
 /**
  * 영상통화 방 생성 요청 커맨드
@@ -17,4 +20,3 @@ public class CreateVideoRoomCommand extends ResponseCommand {
         return fromJson(json, CreateVideoRoomCommand.class);
     }
 }
-

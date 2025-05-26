@@ -1,6 +1,6 @@
 package com.teamnova.dto.chat;
 
-import com.teamnova.command.CreateRoomCommand.RoomType;
+import com.teamnova.command.chat.CreateRoomCommand.RoomType;
 
 public class RoomData {
     public Long id;

@@ -8,8 +8,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.teamnova.command.ResponseCommand;
-import com.teamnova.command.CreateRoomCommand.RoomType;
 import com.teamnova.command.ResponseCommand.TransmissionStatus;
+import com.teamnova.command.chat.CreateRoomCommand.RoomType;
 
 /**
  * 채팅방 클래스
@@ -27,7 +27,6 @@ public class ChatRoom {
     public List<User> userList = new CopyOnWriteArrayList<>(); // 이 채팅방에 속한 사용자 리스트
     public List<VideoRoom> videoRooms = new ArrayList<>();
 
-    
     // 방 내부 모든 멤버에게 커맨드 전송
     public void broadcastToRoom(ResponseCommand command) {
         log.debug("broadcastToRoom: START");

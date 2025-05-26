@@ -165,7 +165,7 @@
 
 ### 3.1 DTO 하위 패키지 생성
 
-- [ ] **기능별 DTO 패키지 생성**
+- [x] **기능별 DTO 패키지 생성**
   ```bash
   mkdir -p src/main/java/com/teamnova/dto/chat
   mkdir -p src/main/java/com/teamnova/dto/webrtc
@@ -174,87 +174,87 @@
 
 ### 3.2 채팅 관련 DTO 이동
 
-- [ ] **채팅 관련 DTO 클래스 이동**
-  - [ ] `dto/Message.java` → `dto/chat/Message.java`
+- [x] **채팅 관련 DTO 클래스 이동**
+  - [x] `dto/Message.java` → `dto/chat/Message.java`
     ```bash
     git mv src/main/java/com/teamnova/dto/Message.java src/main/java/com/teamnova/dto/chat/Message.java
     ```
-  - [ ] `dto/RoomData.java` → `dto/chat/RoomData.java`
+  - [x] `dto/RoomData.java` → `dto/chat/RoomData.java`
     ```bash
     git mv src/main/java/com/teamnova/dto/RoomData.java src/main/java/com/teamnova/dto/chat/RoomData.java
     ```
-  - [ ] `dto/MessageStatus.java` → `dto/chat/MessageStatus.java`
+  - [x] `dto/MessageStatus.java` → `dto/chat/MessageStatus.java`
     ```bash
     git mv src/main/java/com/teamnova/dto/MessageStatus.java src/main/java/com/teamnova/dto/chat/MessageStatus.java
     ```
 
 ### 3.3 WebRTC 관련 DTO 이동
 
-- [ ] **WebRTC 관련 DTO 클래스 이동**
-  - [ ] `dto/SDP.java` → `dto/webrtc/SDP.java`
+- [x] **WebRTC 관련 DTO 클래스 이동**
+  - [x] `dto/SDP.java` → `dto/webrtc/SDP.java`
     ```bash
     git mv src/main/java/com/teamnova/dto/SDP.java src/main/java/com/teamnova/dto/webrtc/SDP.java
     ```
-  - [ ] `SessionDescription.java` → `dto/webrtc/SessionDescription.java`
+  - [x] `SessionDescription.java` → `dto/webrtc/SessionDescription.java`
     ```bash
     git mv src/main/java/com/teamnova/SessionDescription.java src/main/java/com/teamnova/dto/webrtc/SessionDescription.java
     ```
-  - [ ] `IceCandidate.java` → `dto/webrtc/IceCandidate.java`
+  - [x] `IceCandidate.java` → `dto/webrtc/IceCandidate.java`
     ```bash
     git mv src/main/java/com/teamnova/IceCandidate.java src/main/java/com/teamnova/dto/webrtc/IceCandidate.java
     ```
 
 ### 3.4 사용자 관련 DTO 이동
 
-- [ ] **사용자 관련 DTO 클래스 이동**
-  - [ ] `dto/Member.java` → `dto/user/Member.java`
+- [x] **사용자 관련 DTO 클래스 이동**
+  - [x] `dto/Member.java` → `dto/user/Member.java`
     ```bash
     git mv src/main/java/com/teamnova/dto/Member.java src/main/java/com/teamnova/dto/user/Member.java
     ```
-  - [ ] `UserData.java` → `dto/user/UserData.java`
+  - [x] `UserData.java` → `dto/user/UserData.java`
     ```bash
     git mv src/main/java/com/teamnova/UserData.java src/main/java/com/teamnova/dto/user/UserData.java
     ```
 
 ### 3.5 import 문 수정
 
-- [ ] **채팅 DTO import 문 수정**
+- [x] **채팅 DTO import 문 수정**
 
-  - [ ] Message 클래스를 사용하는 모든 클래스 수정
-  - [ ] RoomData 클래스를 사용하는 모든 클래스 수정
-  - [ ] MessageStatus 클래스를 사용하는 모든 클래스 수정
+  - [x] Message 클래스를 사용하는 모든 클래스 수정
+  - [x] RoomData 클래스를 사용하는 모든 클래스 수정
+  - [x] MessageStatus 클래스를 사용하는 모든 클래스 수정
 
-- [ ] **WebRTC DTO import 문 수정**
+- [x] **WebRTC DTO import 문 수정**
 
-  - [ ] SDP 클래스를 사용하는 모든 클래스 수정
-  - [ ] SessionDescription 클래스를 사용하는 모든 클래스 수정
-  - [ ] IceCandidate 클래스를 사용하는 모든 클래스 수정
+  - [x] SDP 클래스를 사용하는 모든 클래스 수정
+  - [x] SessionDescription 클래스를 사용하는 모든 클래스 수정
+  - [x] IceCandidate 클래스를 사용하는 모든 클래스 수정
 
-- [ ] **사용자 DTO import 문 수정**
-  - [ ] Member 클래스를 사용하는 모든 클래스 수정
-  - [ ] UserData 클래스를 사용하는 모든 클래스 수정
+- [x] **사용자 DTO import 문 수정**
+  - [x] Member 클래스를 사용하는 모든 클래스 수정
+  - [x] UserData 클래스를 사용하는 모든 클래스 수정
 
 ### 3.6 컴파일 및 테스트
 
-- [ ] **컴파일 확인**
+- [x] **컴파일 확인**
   ```bash
   mvn compile
   ```
-- [ ] **컴파일 에러 수정** (있다면)
+- [x] **컴파일 에러 수정** (있다면)
 
-- [ ] **테스트 실행**
+- [x] **테스트 실행**
   ```bash
   mvn test
   ```
-- [ ] **테스트 실패 수정** (있다면)
+- [x] **테스트 실패 수정** (있다면)
 
 ### 🎯 Phase 3 완료 체크포인트 및 커밋
 
-- [ ] **DTO 패키지 구조화 완료**
-- [ ] **모든 DTO 클래스 기능별 분리 완료**
-- [ ] **모든 import 문 수정 완료**
-- [ ] **컴파일 및 테스트 통과 확인**
-- [ ] **커밋 실행**
+- [x] **DTO 패키지 구조화 완료**
+- [x] **모든 DTO 클래스 기능별 분리 완료**
+- [x] **모든 import 문 수정 완료**
+- [x] **컴파일 및 테스트 통과 확인**
+- [x] **커밋 실행**
   ```bash
   git add .
   git commit -m "Phase 3 완료: DTO 패키지 구조화 - 기능별 DTO 클래스 분리"

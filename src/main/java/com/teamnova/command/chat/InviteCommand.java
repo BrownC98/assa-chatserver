@@ -1,7 +1,8 @@
-package com.teamnova.command;
+package com.teamnova.command.chat;
 
 import java.util.List;
 
+import com.teamnova.command.Action;
 import com.teamnova.dto.user.UserData;
 
 // 요청시 필요한 데이터 - 방 id,  요청자 id, 피초대자 id 들 
