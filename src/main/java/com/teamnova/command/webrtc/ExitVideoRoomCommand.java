@@ -7,7 +7,6 @@ public class ExitVideoRoomCommand extends ResponseCommand {
 
     public Boolean isHost = false;
     public String videoRoomId;
-    public Long roomId;
 
     public ExitVideoRoomCommand() {
         super(Action.EXIT_VIDEO_ROOM, 0L);
