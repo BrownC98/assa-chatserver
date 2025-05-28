@@ -11,7 +11,6 @@ import com.teamnova.dto.user.UserData;
  */
 public class JoinVideoRoomCommand extends ResponseCommand {
 
-    public Long roomId;
     public String videoRoomId;
     public String profileImage;
     public String nickname;
@@ -19,9 +18,9 @@ public class JoinVideoRoomCommand extends ResponseCommand {
     public boolean videoEnabled;
     public boolean audioEnabled;
 
-    public JoinVideoRoomCommand(Long roomId, Long recipientId) {
-        super(Action.JOIN_VIDEO_ROOM, recipientId);
-        this.roomId = roomId;
+    public JoinVideoRoomCommand(String videoRoomId) {
+        super(Action.JOIN_VIDEO_ROOM, 0L);
+        this.videoRoomId = videoRoomId;
     }
 
     public static JoinVideoRoomCommand fromJson(String json) throws Exception {

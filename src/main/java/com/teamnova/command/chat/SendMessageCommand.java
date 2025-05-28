@@ -6,26 +6,25 @@ import com.teamnova.command.ResponseCommand;
 public class SendMessageCommand extends ResponseCommand {
 
     public Long messageId;
-    public Long roomId;
     public String content;
-    public MessageType type;
+    public Type type;
     public ReadStatus readStatus;
+    public boolean isTimeShow = true; // 채팅방에서 메시지 시간을 표시할지 여부
+    public boolean isProfileShow = true; // 채팅방에서 프로필 사진을 표시할지 여부
 
-    public SendMessageCommand(Long recipientId, Long roomId, String content, MessageType type,
-            TransmissionStatus ts, ReadStatus rs) {
-        super(Action.SEND_MESSAGE, recipientId);
+    public SendMessageCommand(Long roomId, String content, Type type) {
+        super(Action.SEND_MESSAGE, 0L); // 수신자 id는 0(서버) 로 설정
         this.roomId = roomId;
         this.content = content;
         this.type = type;
-        this.transmissionStatus = ts;
-        this.readStatus = rs;
+        this.readStatus = ReadStatus.UNREAD;
     }
 
     public static SendMessageCommand fromJson(String json) throws Exception {
         return fromJson(json, SendMessageCommand.class);
     }
 
-    public enum MessageType {
+    public enum Type {
         TEXT,
         IMAGE,
         VIDEO,
@@ -34,7 +33,26 @@ public class SendMessageCommand extends ResponseCommand {
     }
 
     public enum ReadStatus {
-        READ,
+        read,
         UNREAD
+    }
+
+    @Override
+    public String toString() {
+        return "SendMessageCommand{" +
+                "messageId=" + messageId +
+                ", content='" + content + '\'' +
+                ", type=" + type +
+                ", readStatus=" + readStatus +
+                ", isTimeShow=" + isTimeShow +
+                ", isProfileShow=" + isProfileShow +
+                ", recipientId=" + recipientId +
+                ", transmissionStatus=" + transmissionStatus +
+                ", roomId=" + roomId +
+                ", id=" + id +
+                ", action=" + action +
+                ", requesterId=" + requesterId +
+                ", createdAT='" + createdAT + '\'' +
+                '}';
     }
 }

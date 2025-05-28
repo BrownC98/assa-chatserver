@@ -34,13 +34,13 @@ public class MessageTest {
     public void testSendMessage() {
         // Given: 메시지 전송 명령 생성
         SendMessageCommand command = new SendMessageCommand(
-                123L, // recipientId
                 1L, // roomId
                 "테스트 메시지", // content
-                SendMessageCommand.MessageType.TEXT, // type
-                SendMessageCommand.TransmissionStatus.NOT_SENT, // transmissionStatus
-                SendMessageCommand.ReadStatus.UNREAD // readStatus
+                SendMessageCommand.Type.TEXT // type
         );
+        command.recipientId = 123L;
+        command.transmissionStatus = SendMessageCommand.TransmissionStatus.NOT_SENT;
+        command.readStatus = SendMessageCommand.ReadStatus.UNREAD;
 
         // When & Then: 메시지 전송 메서드가 예외 없이 실행되는지 확인
         try {

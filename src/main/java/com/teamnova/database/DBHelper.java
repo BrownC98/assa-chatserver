@@ -28,6 +28,8 @@ import com.teamnova.dto.chat.MessageStatus;
 import com.teamnova.dto.chat.RoomData;
 import com.teamnova.dto.user.UserData;
 import com.teamnova.user.User;
+import com.teamnova.utils.LoggingUtils;
+import com.teamnova.utils.PerformanceLogger;
 import com.teamnova.utils.TimeUtils;
 
 /**
@@ -35,7 +37,7 @@ import com.teamnova.utils.TimeUtils;
  */
 public class DBHelper {
 
-    private static Logger log = LogManager.getLogger(DBHelper.class.getName());
+    private static final Logger log = LogManager.getLogger(DBHelper.class);
 
     private static DBHelper instance = null;
 
@@ -45,74 +47,174 @@ public class DBHelper {
 
     private String imgHost; // 이미지 호스트 경로
 
+    // 성능 임계값 (밀리초)
+    private static final long SLOW_QUERY_THRESHOLD_MS = 100;
+    private static final long VERY_SLOW_QUERY_THRESHOLD_MS = 1000;
+
+    // 연결 상태 추적
+    private long connectionStartTime;
+    private int queryCount = 0;
+    private long totalQueryTime = 0;
+
     public static DBHelper getInstance() {
         if (instance == null) {
-            instance = new DBHelper();
+            synchronized (DBHelper.class) {
+                if (instance == null) {
+                    log.debug("DBHelper 싱글톤 인스턴스 생성 시작");
+                    instance = new DBHelper();
+                    log.info("DBHelper 싱글톤 인스턴스 생성 완료");
+                }
+            }
         }
-
         return instance;
     }
 
     private DBHelper() {
-        this.imgHost = PropertiesManager.getProperty("IMG_HOST");
-        connect();
+        String operationId = LoggingUtils.generateOperationId();
+
+        log.debug("DBHelper 초기화 시작: operationId={}", operationId);
+
+        try {
+            this.imgHost = PropertiesManager.getProperty("IMG_HOST");
+
+            // imgHost가 null인 경우 기본값 설정
+            if (this.imgHost == null || this.imgHost.trim().isEmpty()) {
+                this.imgHost = ""; // 빈 문자열로 설정하여 null 연결 방지
+                log.warn("IMG_HOST 설정이 없습니다. 빈 문자열로 설정됩니다: operationId={}", operationId);
+            }
+
+            log.debug("이미지 호스트 설정 완료: operationId={}, imgHost={}", operationId, imgHost);
+
+            connect(operationId);
+
+            log.info("DBHelper 초기화 완료: operationId={}, imgHost={}", operationId, imgHost);
+        } catch (Exception e) {
+            log.fatal("DBHelper 초기화 실패: operationId={}, error={}", operationId, e.getMessage(), e);
+            throw new RuntimeException("데이터베이스 초기화 실패", e);
+        }
     }
 
     // db 연결
-    private void connect() {
+    private void connect(String operationId) {
+        PerformanceLogger.Timer timer = PerformanceLogger.startTimer("DB_CONNECT",
+                String.format("operationId=%s", operationId));
+
+        log.debug("데이터베이스 연결 시작: operationId={}", operationId);
+
         try {
             // 드라이버 로딩
             Class.forName("com.mysql.cj.jdbc.Driver");
+            log.debug("MySQL 드라이버 로딩 완료: operationId={}", operationId);
 
-            // db 접속 정보 가져오기
+            // DB 접속 정보 가져오기
             String dbUrl = PropertiesManager.getProperty("DB_URL");
             String dbUser = PropertiesManager.getProperty("DB_USER");
             String dbPw = PropertiesManager.getProperty("DB_PW");
 
-            // connection 객체 얻기
-            conn = DriverManager.getConnection(dbUrl, dbUser, dbPw);
-            log.debug("db 커넥션 객체 획득");
+            // 민감정보 마스킹하여 로깅
+            String maskedUrl = LoggingUtils.maskToken(dbUrl);
+            String maskedUser = LoggingUtils.sanitizeUserName(dbUser);
 
-            // statement 객체 얻기
+            log.debug("데이터베이스 연결 정보: operationId={}, url={}, user={}",
+                    operationId, maskedUrl, maskedUser);
+
+            // Connection 객체 얻기
+            connectionStartTime = System.currentTimeMillis();
+            conn = DriverManager.getConnection(dbUrl, dbUser, dbPw);
+
+            // Statement 객체 얻기
             statement = conn.createStatement();
 
+            long connectionTime = timer.stop();
+
+            log.info("데이터베이스 연결 성공: operationId={}, connectionTime={}ms, url={}",
+                    operationId, connectionTime, maskedUrl);
+
+            // 연결 상태 확인
+            if (conn.isValid(5)) {
+                log.debug("데이터베이스 연결 유효성 확인 완료: operationId={}", operationId);
+            } else {
+                log.warn("데이터베이스 연결 유효성 확인 실패: operationId={}", operationId);
+            }
+
+        } catch (ClassNotFoundException e) {
+            timer.stop("ERROR: Driver not found");
+            log.error("MySQL 드라이버를 찾을 수 없음: operationId={}, error={}", operationId, e.getMessage(), e);
+            throw new RuntimeException("MySQL 드라이버 로딩 실패", e);
+        } catch (SQLException e) {
+            timer.stop("ERROR: Connection failed");
+            log.error("데이터베이스 연결 실패: operationId={}, sqlState={}, errorCode={}, error={}",
+                    operationId, e.getSQLState(), e.getErrorCode(), e.getMessage(), e);
+            throw new RuntimeException("데이터베이스 연결 실패", e);
         } catch (Exception e) {
-            e.printStackTrace();
+            timer.stop("ERROR: " + e.getMessage());
+            log.error("데이터베이스 연결 중 예상치 못한 오류: operationId={}, error={}",
+                    operationId, e.getMessage(), e);
+            throw new RuntimeException("데이터베이스 연결 중 오류", e);
         }
     }
 
-    // db에 저장된 방목록, 방에 소속돈 멤버 정보를 map 형태로 반환
+    /**
+     * 데이터베이스에 저장된 방목록과 방에 소속된 멤버 정보를 Map 형태로 반환
+     */
     public Map<Long, ChatRoom> getServerData() {
-        Map<Long, ChatRoom> resultMap = new HashMap<>();
-        List<Long> roomIds = new ArrayList<>();
+        String operationId = LoggingUtils.generateOperationId();
+        PerformanceLogger.Timer timer = PerformanceLogger.startTimer("GET_SERVER_DATA",
+                String.format("operationId=%s", operationId));
 
-        // 유저 id, nickname, 프사, 소속 방 번호 순으로 출력됨
+        log.debug("서버 데이터 로드 시작: operationId={}", operationId);
+
+        Map<Long, ChatRoom> resultMap = new HashMap<>();
         String query = "select users.id as user_id, chat_room_id from users, user_chatroom_map where users.id = user_chatroom_map.user_id";
+
+        int roomCount = 0;
+        int userCount = 0;
 
         try {
             PreparedStatement psmt = conn.prepareStatement(query);
+            log.debug("서버 데이터 쿼리 실행: operationId={}", operationId);
+
             ResultSet rs = psmt.executeQuery();
 
             while (rs.next()) {
-
                 long roomId = rs.getLong("chat_room_id");
+                long userId = rs.getLong("user_id");
 
                 if (!resultMap.containsKey(roomId)) {
                     // 처음 보는 방번호인 경우 key 생성
                     ChatRoom room = new ChatRoom();
                     room.id = roomId;
                     resultMap.put(roomId, room);
+                    roomCount++;
+
+                    log.trace("새 채팅방 발견: operationId={}, roomId={}, totalRooms={}",
+                            operationId, roomId, roomCount);
                 }
 
                 // user 객체 생성
-                long userId = rs.getLong("user_id");
                 User user = new User(userId);
-
-                // 매칭되는 방에 유저 추가
                 resultMap.get(roomId).userList.add(user);
+                userCount++;
+
+                log.trace("사용자 추가: operationId={}, roomId={}, userId={}, roomUserCount={}",
+                        operationId, roomId, userId, resultMap.get(roomId).userList.size());
             }
+
+            long duration = timer.stop();
+            log.info("서버 데이터 로드 완료: operationId={}, roomCount={}, userCount={}, duration={}ms",
+                    operationId, roomCount, userCount, duration);
+
+            // 성능 임계값 체크
+            if (duration > SLOW_QUERY_THRESHOLD_MS) {
+                log.warn("서버 데이터 로드 성능 경고: operationId={}, duration={}ms, threshold={}ms",
+                        operationId, duration, SLOW_QUERY_THRESHOLD_MS);
+            }
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            timer.stop("ERROR: " + e.getSQLState());
+            log.error("서버 데이터 로드 실패: operationId={}, sqlState={}, errorCode={}, error={}",
+                    operationId, e.getSQLState(), e.getErrorCode(), e.getMessage(), e);
+            throw new RuntimeException("서버 데이터 로드 실패", e);
         }
 
         return resultMap;
@@ -319,7 +421,7 @@ public class DBHelper {
                 String exitedAt = rs.getString("exited_at");
 
                 // 서버 내부 경로 반환시 호스트 경로 추가
-                if (!profileImage.contains("http")) {
+                if (profileImage != null && !profileImage.contains("http")) {
                     profileImage = imgHost + profileImage;
                 }
 
@@ -509,16 +611,23 @@ public class DBHelper {
         return Long.valueOf(lastInsertedId);
     }
 
-    // 메시지를 db에 저장
+    /**
+     * 메시지를 데이터베이스에 저장
+     */
     public long insertMessage(SendMessageCommand command) {
-        log.debug("insertMessage: START - params: command={}", command);
+        String operationId = LoggingUtils.generateOperationId();
+        PerformanceLogger.Timer timer = PerformanceLogger.startTimer("INSERT_MESSAGE",
+                String.format("operationId=%s,roomId=%d,senderId=%d", operationId, command.roomId,
+                        command.requesterId));
 
-        String q = "insert into messages (chat_room_id, sender_id, content, type, sended_at) VALUES (?, ? ,?, ?, ?)";
-        long ret = -1;
+        log.debug("메시지 저장 시작: operationId={}, roomId={}, senderId={}, messageType={}, contentLength={}",
+                operationId, command.roomId, command.requesterId, command.type,
+                command.content != null ? command.content.length() : 0);
 
-        try (PreparedStatement pstmt = conn.prepareStatement(q,
-                PreparedStatement.RETURN_GENERATED_KEYS)) {
+        String query = "insert into messages (chat_room_id, sender_id, content, type, sended_at) VALUES (?, ?, ?, ?, ?)";
+        long messageId = -1;
 
+        try (PreparedStatement pstmt = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             // 값 설정
             pstmt.setLong(1, command.roomId);
             pstmt.setLong(2, command.requesterId);
@@ -526,7 +635,8 @@ public class DBHelper {
             pstmt.setString(4, command.type.toString());
             pstmt.setString(5, command.createdAT);
 
-            log.debug("query = {}", pstmt);
+            log.trace("메시지 저장 쿼리 준비 완료: operationId={}, roomId={}, senderId={}",
+                    operationId, command.roomId, command.requesterId);
 
             // SQL 실행
             int insertedRows = pstmt.executeUpdate();
@@ -535,73 +645,137 @@ public class DBHelper {
                 // 삽입된 행의 ID 가져오기
                 try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        long generatedId = generatedKeys.getLong(1);
-                        log.debug("삽입된 행의 ID: " + generatedId);
+                        messageId = generatedKeys.getLong(1);
 
-                        // 디버깅 로그
-                        log.debug("Message가 DB에 추가되었습니다. 삽입된 행의 ID: " + generatedId);
-                        ret = generatedId;
+                        long duration = timer.stop();
+                        log.info("메시지 저장 완료: operationId={}, messageId={}, roomId={}, senderId={}, " +
+                                "messageType={}, duration={}ms",
+                                operationId, messageId, command.roomId, command.requesterId,
+                                command.type, duration);
+
+                        // 성능 임계값 체크
+                        if (duration > SLOW_QUERY_THRESHOLD_MS) {
+                            log.warn("메시지 저장 성능 경고: operationId={}, messageId={}, duration={}ms, threshold={}ms",
+                                    operationId, messageId, duration, SLOW_QUERY_THRESHOLD_MS);
+                        }
                     } else {
-                        log.debug("반환된 키 값 없음");
+                        timer.stop("ERROR: No generated keys");
+                        log.error("메시지 저장 실패 - 생성된 키 없음: operationId={}, roomId={}, senderId={}",
+                                operationId, command.roomId, command.requesterId);
                         throw new SQLException("반환된 키 값 없음");
                     }
                 }
             } else {
-                log.debug("행이 삽입되지 않음");
+                timer.stop("ERROR: No rows inserted");
+                log.error("메시지 저장 실패 - 삽입된 행 없음: operationId={}, roomId={}, senderId={}",
+                        operationId, command.roomId, command.requesterId);
                 throw new SQLException("행이 삽입되지 않음");
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            timer.stop("ERROR: " + e.getSQLState());
+            log.error("메시지 저장 중 데이터베이스 오류: operationId={}, roomId={}, senderId={}, " +
+                    "sqlState={}, errorCode={}, error={}",
+                    operationId, command.roomId, command.requesterId,
+                    e.getSQLState(), e.getErrorCode(), e.getMessage(), e);
+            throw new RuntimeException("메시지 저장 실패", e);
         }
 
-        log.debug("insertMessge: END");
-        return ret;
+        return messageId;
     }
 
-    // 메시지 읽음 상태 테이블 insert
+    /**
+     * 메시지 읽음 상태를 배치로 삽입 (트랜잭션 처리)
+     */
     public void insertMessageReadStatus(SendMessageCommand command) {
-        log.debug("insertMessageReadStatus: START - parms: command");
+        String operationId = LoggingUtils.generateOperationId();
+        PerformanceLogger.Timer timer = PerformanceLogger.startTimer("INSERT_MESSAGE_READ_STATUS",
+                String.format("operationId=%s,messageId=%d,roomId=%d", operationId, command.messageId, command.roomId));
 
-        String q = "INSERT INTO message_status (message_id, recipient_id, status, date_time) VALUES (?, ?, ?, ?)";
+        log.debug("메시지 읽음 상태 배치 삽입 시작: operationId={}, messageId={}, roomId={}",
+                operationId, command.messageId, command.roomId);
 
-        try (PreparedStatement pstmt = conn.prepareStatement(q)) {
-            // 배치처리로 한꺼번에 처리
+        String query = "INSERT INTO message_status (message_id, recipient_id, status, date_time) VALUES (?, ?, ?, ?)";
+        boolean originalAutoCommit = true;
+        int batchSize = 0;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            // 트랜잭션 시작
+            originalAutoCommit = conn.getAutoCommit();
             conn.setAutoCommit(false);
+
+            log.debug("트랜잭션 시작: operationId={}, messageId={}, originalAutoCommit={}",
+                    operationId, command.messageId, originalAutoCommit);
 
             // 멤버목록 불러오기
             List<UserData> memberList = getMemberData(command.roomId);
+            log.debug("멤버 목록 조회 완료: operationId={}, messageId={}, memberCount={}",
+                    operationId, command.messageId, memberList.size());
 
+            // 배치 준비
             for (UserData recipient : memberList) {
                 pstmt.setLong(1, command.messageId);
                 pstmt.setLong(2, recipient.id);
                 pstmt.setString(3, SendMessageCommand.ReadStatus.UNREAD.toString());
                 pstmt.setString(4, command.createdAT);
                 pstmt.addBatch();
+                batchSize++;
+
+                log.trace("배치 항목 추가: operationId={}, messageId={}, recipientId={}, batchSize={}",
+                        operationId, command.messageId, recipient.id, batchSize);
             }
 
-            // 모든 배치 실행
+            // 배치 실행
+            log.debug("배치 실행 시작: operationId={}, messageId={}, batchSize={}",
+                    operationId, command.messageId, batchSize);
+
             int[] affectedRows = pstmt.executeBatch();
 
             // 커밋
             conn.commit();
-            log.debug("{} 개의 행이 삽입됨", affectedRows.length);
 
-            conn.setAutoCommit(true);
+            long duration = timer.stop();
+            log.info("메시지 읽음 상태 배치 삽입 완료: operationId={}, messageId={}, roomId={}, " +
+                    "batchSize={}, affectedRows={}, duration={}ms",
+                    operationId, command.messageId, command.roomId, batchSize, affectedRows.length, duration);
+
+            // 성능 임계값 체크
+            if (duration > SLOW_QUERY_THRESHOLD_MS) {
+                log.warn("메시지 읽음 상태 배치 삽입 성능 경고: operationId={}, messageId={}, " +
+                        "batchSize={}, duration={}ms, threshold={}ms",
+                        operationId, command.messageId, batchSize, duration, SLOW_QUERY_THRESHOLD_MS);
+            }
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            // 롤백
+            timer.stop("ERROR: " + e.getSQLState());
+            log.error("메시지 읽음 상태 배치 삽입 실패: operationId={}, messageId={}, roomId={}, " +
+                    "batchSize={}, sqlState={}, errorCode={}, error={}",
+                    operationId, command.messageId, command.roomId, batchSize,
+                    e.getSQLState(), e.getErrorCode(), e.getMessage(), e);
+
+            // 롤백 시도
             try {
                 if (conn != null) {
                     conn.rollback();
+                    log.info("트랜잭션 롤백 완료: operationId={}, messageId={}", operationId, command.messageId);
                 }
             } catch (SQLException rollbackEx) {
-                rollbackEx.printStackTrace();
+                log.error("트랜잭션 롤백 실패: operationId={}, messageId={}, rollbackError={}",
+                        operationId, command.messageId, rollbackEx.getMessage(), rollbackEx);
+            }
+
+            throw new RuntimeException("메시지 읽음 상태 배치 삽입 실패", e);
+        } finally {
+            // AutoCommit 원복
+            try {
+                conn.setAutoCommit(originalAutoCommit);
+                log.debug("AutoCommit 원복 완료: operationId={}, messageId={}, autoCommit={}",
+                        operationId, command.messageId, originalAutoCommit);
+            } catch (SQLException e) {
+                log.error("AutoCommit 원복 실패: operationId={}, messageId={}, error={}",
+                        operationId, command.messageId, e.getMessage(), e);
             }
         }
-
-        log.debug("insertMessagerReadStatus: END");
     }
 
     public MessageStatus getMessageReadStatus(long msgId) {
@@ -715,7 +889,7 @@ public class DBHelper {
                 String profileImage = rs.getString("profile_image");
 
                 // 서버 내부 경로 반환시 호스트 경로 추가
-                if (!profileImage.contains("http")) {
+                if (profileImage != null && !profileImage.contains("http")) {
                     profileImage = imgHost + profileImage;
                 }
 

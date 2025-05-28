@@ -5,7 +5,7 @@ import com.teamnova.command.ResponseCommand;
 
 public class ExitVideoRoomCommand extends ResponseCommand {
 
-    public Boolean isHost;
+    public Boolean isHost = false;
     public String videoRoomId;
     public Long roomId;
 

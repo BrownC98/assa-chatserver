@@ -8,7 +8,6 @@ import com.teamnova.command.ResponseCommand;
  */
 public class CreateVideoRoomCommand extends ResponseCommand {
 
-    public Long roomId;
     public String videoRoomId;
 
     public CreateVideoRoomCommand(Long roomId) {

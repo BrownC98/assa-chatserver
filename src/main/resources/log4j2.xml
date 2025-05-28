@@ -1,13 +1,143 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
-  <Appenders>
-    <Console name="Console" target="SYSTEM_OUT">
-      <PatternLayout charset="UTF-8" pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-    </Console>
-  </Appenders>
-  <Loggers>
-    <Root level="trace">
-      <AppenderRef ref="Console"/>
-    </Root>
-  </Loggers>
+    <Properties>
+        <!-- 로그 파일 경로 설정 -->
+        <Property name="LOG_PATH">logs</Property>
+        <Property name="LOG_FILE_NAME">assa-chat-server</Property>
+        
+        <!-- 로그 패턴 설정 -->
+        <Property name="CONSOLE_PATTERN">%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+        <Property name="FILE_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+        
+        <!-- 성능 임계값 설정 -->
+        <Property name="ASYNC_BUFFER_SIZE">8192</Property>
+        <Property name="ASYNC_BATCH_SIZE">256</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- 콘솔 출력 (개발 환경용) -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${CONSOLE_PATTERN}" charset="UTF-8"/>
+        </Console>
+
+        <!-- 메인 로그 파일 (일반 로그) -->
+        <RollingFile name="FileAppender" fileName="${LOG_PATH}/${LOG_FILE_NAME}.log"
+                     filePattern="${LOG_PATH}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${FILE_PATTERN}" charset="UTF-8"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30" compressionLevel="9"/>
+        </RollingFile>
+
+        <!-- 에러 전용 로그 파일 -->
+        <RollingFile name="ErrorFileAppender" fileName="${LOG_PATH}/${LOG_FILE_NAME}-error.log"
+                     filePattern="${LOG_PATH}/${LOG_FILE_NAME}-error-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${FILE_PATTERN}" charset="UTF-8"/>
+            <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="50MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30" compressionLevel="9"/>
+        </RollingFile>
+
+        <!-- 성능 로그 파일 -->
+        <RollingFile name="PerformanceFileAppender" fileName="${LOG_PATH}/${LOG_FILE_NAME}-performance.log"
+                     filePattern="${LOG_PATH}/${LOG_FILE_NAME}-performance-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${FILE_PATTERN}" charset="UTF-8"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="50MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="7" compressionLevel="9"/>
+        </RollingFile>
+
+        <!-- 비동기 처리를 위한 AsyncAppender (성능 최적화) -->
+        <Async name="AsyncFileAppender" bufferSize="${ASYNC_BUFFER_SIZE}">
+            <AppenderRef ref="FileAppender"/>
+        </Async>
+        
+        <Async name="AsyncErrorAppender" bufferSize="${ASYNC_BUFFER_SIZE}">
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Async>
+    </Appenders>
+
+    <Loggers>
+        <!-- 패키지별 세부 로그 레벨 설정 -->
+        
+        <!-- 사용자 관리 관련 로깅 -->
+        <Logger name="com.teamnova.user" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AsyncFileAppender"/>
+            <AppenderRef ref="AsyncErrorAppender"/>
+        </Logger>
+
+        <!-- 채팅 관련 로깅 -->
+        <Logger name="com.teamnova.chat" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AsyncFileAppender"/>
+            <AppenderRef ref="AsyncErrorAppender"/>
+        </Logger>
+
+        <!-- 메시지 처리 관련 로깅 -->
+        <Logger name="com.teamnova.message" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AsyncFileAppender"/>
+            <AppenderRef ref="AsyncErrorAppender"/>
+        </Logger>
+
+        <!-- WebRTC 시그널링 관련 로깅 -->
+        <Logger name="com.teamnova.webrtc" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AsyncFileAppender"/>
+            <AppenderRef ref="AsyncErrorAppender"/>
+        </Logger>
+
+        <!-- 서버 관련 로깅 -->
+        <Logger name="com.teamnova.server" level="INFO" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AsyncFileAppender"/>
+            <AppenderRef ref="AsyncErrorAppender"/>
+        </Logger>
+
+        <!-- 데이터베이스 관련 로깅 -->
+        <Logger name="com.teamnova.database" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AsyncFileAppender"/>
+            <AppenderRef ref="AsyncErrorAppender"/>
+        </Logger>
+
+        <!-- 명령 처리 관련 로깅 -->
+        <Logger name="com.teamnova.command" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AsyncFileAppender"/>
+            <AppenderRef ref="AsyncErrorAppender"/>
+        </Logger>
+
+        <!-- 유틸리티 관련 로깅 -->
+        <Logger name="com.teamnova.utils" level="INFO" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AsyncFileAppender"/>
+            <AppenderRef ref="AsyncErrorAppender"/>
+        </Logger>
+
+        <!-- 성능 측정 전용 로거 -->
+        <Logger name="PERFORMANCE" level="INFO" additivity="false">
+            <AppenderRef ref="PerformanceFileAppender"/>
+        </Logger>
+
+        <!-- 외부 라이브러리 로그 레벨 조정 -->
+        <Logger name="org.apache" level="WARN"/>
+        <Logger name="com.mysql" level="WARN"/>
+        <Logger name="com.zaxxer.hikari" level="WARN"/>
+
+        <!-- 루트 로거 설정 -->
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AsyncFileAppender"/>
+            <AppenderRef ref="AsyncErrorAppender"/>
+        </Root>
+    </Loggers>
 </Configuration>

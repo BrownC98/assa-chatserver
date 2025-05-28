@@ -10,7 +10,7 @@ public class CreateRoomCommand extends BaseCommand {
     public List<Long> invitedIdList;
     public String roomName;
     public String description;
-    public RoomType roomType;
+    public RoomType roomType = RoomType.NORMAL;
 
     public CreateRoomCommand(List<Long> invitedIdList) {
         super(Action.CREATE_ROOM);
