@@ -131,6 +131,30 @@
         </execution>
       </executions>
     </plugin>
+    <plugin>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>exec-maven-plugin</artifactId>
+      <version>3.1.0</version>
+      <configuration>
+        <mainClass>com.teamnova.Main</mainClass>
+        <options>
+          <option>-Dfile.encoding=UTF-8</option>
+          <option>-Dconsole.encoding=UTF-8</option>
+          <option>-Dsun.jnu.encoding=UTF-8</option>
+          <option>-Dlog4j.configurationFile=src/main/resources/log4j2.xml</option>
+        </options>
+        <systemProperties>
+          <systemProperty>
+            <key>file.encoding</key>
+            <value>UTF-8</value>
+          </systemProperty>
+          <systemProperty>
+            <key>console.encoding</key>
+            <value>UTF-8</value>
+          </systemProperty>
+        </systemProperties>
+      </configuration>
+    </plugin>
   </plugins>
     
   </build>

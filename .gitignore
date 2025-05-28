@@ -1,4 +1,15 @@
-# Maven
+# ASSA Chat Server .gitignore
+
+# ===== Java =====
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# ===== Maven =====
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -7,24 +18,35 @@ pom.xml.next
 release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
-.mvn/
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
 
-# IDE specific files
-# IntelliJ
+# ===== IDE =====
+# IntelliJ IDEA
 .idea/
+*.iws
 *.iml
 *.ipr
-*.iws
 out/
+
+# Eclipse
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+.project
+.classpath
 
 # VS Code
 .vscode/
-
-# Eclipse
-.project
-.classpath
-.settings/
-bin/
+*.code-workspace
 
 # NetBeans
 /nbproject/private/
@@ -33,45 +55,138 @@ bin/
 /nbdist/
 /.nb-gradle/
 
-# Compiled class files and archives
-*.class
-*.jar
-*.war
-*.ear
+# ===== 로그 파일 =====
+logs/
+*.log
+*.log.*
+log4j2.log
+
+# ===== 설정 파일 (보안) =====
+# 데이터베이스 연결 정보 등 민감한 정보가 포함된 설정 파일
+src/main/resources/config.properties
+application.properties
+application-*.properties
+*.env
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# ===== 데이터베이스 =====
+*.db
+*.sqlite
+*.sqlite3
+*.h2.db
+
+# ===== 임시 파일 =====
+*.tmp
+*.temp
+*~
+.DS_Store
+Thumbs.db
+
+# ===== 백업 파일 =====
+*.backup
+*.bak
+*.orig
+
+# ===== 테스트 관련 =====
+# 테스트 결과 파일
+TEST-*.xml
+*.tlog
+
+# ===== 빌드 관련 =====
+build/
+dist/
 *.zip
 *.tar.gz
 *.rar
 
-# Log files
-*.log
-logs/
+# ===== 운영 관련 =====
+# 프로덕션 환경 설정
+prod/
+production/
+deploy/
 
-# OS generated files
-# Mac
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-# Windows
-Thumbs.db
-ehthumbs.db
-desktop.ini
+# PID 파일
+*.pid
 
-# Temporary files
-*.tmp
-*~
-# temp/ # 만약 temp 폴더를 사용한다면
+# ===== 개발 도구 =====
+# JRebel
+rebel.xml
 
-# Specific files from your project structure to ignore
-# (예: 백업 파일이나 개인적인 테스트 파일)
-src/main/java/com/teamnova/ChatServer_origin.java
-src/main/resources/config.properties
+# ===== 문서 임시 파일 =====
+~$*.doc*
+~$*.xls*
+~$*.ppt*
 
-# Local configuration files that should not be committed (if any)
-# 예: src/main/resources/local-config.properties
-# src/main/resources/application-local.properties
+# ===== 마크다운 문서 (불필요한 파일들) =====
+# 개발 과정에서 생성되는 임시 문서들
+*-draft.md
+*-temp.md
+*-backup.md
+*-old.md
+*_backup.md
+*_old.md
+*_temp.md
+*_draft.md
 
-# Secrets (generally better to use environment variables or a secrets manager)
-# .env
-# secrets.yml
+# 개인 메모 및 임시 노트
+notes.md
+memo.md
+todo.md
+scratch.md
+temp-*.md
+draft-*.md
+personal-*.md
+my-*.md
+
+# 가이드라인 및 체크리스트 (개발용)
+logging-guidelines.md
+logging-refactoring-checklist.md
+package-restructuring-checklist.md
+package-restructuring-plan.md
+refactoring.md
+requirements.md
+*.md
+*.mdc
+commandprompt.xml
+
+# 문서 백업 및 버전 관리
+*.md.bak
+*.md.backup
+*.md.old
+*.md.orig
+*.md~
+
+# 문서 편집기 임시 파일
+.*.md.swp
+.*.md.swo
+
+# ===== 기타 =====
+# 사용자 정의 설정
+local/
+personal/
+my-config/
+
+# 캐시 파일
+.cache/
+*.cache
+
+# 업로드된 파일 (이미지 등)
+uploads/
+files/
+images/
+
+# 성능 프로파일링 결과
+*.hprof
+*.prof
+
+# 실행 파일
+*.exe
+*.bat
+*.sh
+*.run
+*.jar
+*.ps1

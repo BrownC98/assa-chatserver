@@ -7,6 +7,7 @@ public abstract class ResponseCommand extends BaseCommand {
 
     public Long recipientId; // 수신자 id
     public TransmissionStatus transmissionStatus; // 전송상태
+    public Long roomId;
 
     public ResponseCommand(Action action, Long recipientId) {
         super(action);
@@ -14,7 +15,7 @@ public abstract class ResponseCommand extends BaseCommand {
         this.transmissionStatus = TransmissionStatus.NOT_SENT;
     }
 
-    public enum TransmissionStatus{
+    public enum TransmissionStatus {
         SENT,
         NOT_SENT
     }

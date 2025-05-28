@@ -2,14 +2,11 @@ package com.teamnova.command;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.teamnova.utils.TimeUtils;
 
-import com.teamnova.Utils.TimeUtils;
+public class BaseCommand {
 
-public abstract class BaseCommand {
-
-    private static final Gson GSON = new GsonBuilder()
-            .setPrettyPrinting()
-            .create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public Long id;
     public Action action;
@@ -18,7 +15,7 @@ public abstract class BaseCommand {
 
     public BaseCommand(Action action) {
         this.action = action;
-        this.requesterId = 0L; // 서버의 id는 0 이다.
+        this.requesterId = 0L; // 서버의 id는 0 이다. (SPHelper.getUserId() 대신)
         this.createdAT = TimeUtils.getCurrentTimeInUTC();
     }
 
@@ -26,7 +23,7 @@ public abstract class BaseCommand {
         return new Gson().toJson(this);
     }
 
-    protected static <T extends BaseCommand> T fromJson(String json, Class<T> clazz) throws Exception {
+    public static <T extends BaseCommand> T fromJson(String json, Class<T> clazz) throws Exception {
         try {
             return GSON.fromJson(json, clazz);
         } catch (Exception e) {
