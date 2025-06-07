@@ -272,18 +272,41 @@ public class DBHelper {
             String description,
             CreateRoomCommand.RoomType roomType,
             Long masterUserId) throws SQLException {
-        log.debug("insertRoom(): START");
+        return insertRoom(roomName, description, roomType, masterUserId, null, null);
+    }
+
+    // 🆕 이미지 URL들을 포함한 오버로드된 insertRoom 메서드
+    public Long insertRoom(
+            String roomName,
+            String description,
+            CreateRoomCommand.RoomType roomType,
+            Long masterUserId,
+            String thumbnail,
+            String coverImageUrl) throws SQLException {
+        log.debug("insertRoom(): START - roomName={}, roomType={}, thumbnail={}, coverImageUrl={}", 
+                roomName, roomType, thumbnail, coverImageUrl);
 
         String sql = "";
         if (roomType == RoomType.NORMAL) {
             sql = "insert into chat_rooms() values()";
         } else if (roomType == RoomType.OPEN) {
-            sql = "insert into chat_rooms(room_name, description, room_type, master_user_id) values('"
-                    + roomName + "', '"
-                    + description + "', '"
-                    + roomType.toString() + "', '"
-                    + masterUserId
-                    + "')";
+            // 동적으로 SQL 구성
+            StringBuilder sqlBuilder = new StringBuilder("insert into chat_rooms(room_name, description, room_type, master_user_id");
+            StringBuilder valuesBuilder = new StringBuilder("values('" + roomName + "', '" + description + "', '" + roomType.toString() + "', '" + masterUserId + "'");
+            
+            if (thumbnail != null && !thumbnail.isEmpty()) {
+                sqlBuilder.append(", thumbnail");
+                valuesBuilder.append(", '").append(thumbnail).append("'");
+            }
+            
+            if (coverImageUrl != null && !coverImageUrl.isEmpty()) {
+                sqlBuilder.append(", cover_image");
+                valuesBuilder.append(", '").append(coverImageUrl).append("'");
+            }
+            
+            sqlBuilder.append(") ");
+            valuesBuilder.append(")");
+            sql = sqlBuilder.toString() + valuesBuilder.toString();
         }
 
         Long insertedId = null;
@@ -324,11 +347,14 @@ public class DBHelper {
                 String description = rs.getString("description");
                 String roomType = rs.getString("room_type");
                 Long masterId = rs.getLong("master_user_id");
+                String thumbnail = rs.getString("thumbnail"); // 🆕 썸네일 이미지 조회
+                String coverImage = rs.getString("cover_image"); // 🆕 커버 이미지 조회
+                Integer currentMembers = rs.getInt("current_members"); // 🆕 현재 멤버 수 조회
                 // String exitedAt = rs.getString("exited_at");
 
-                log.debug("roomName={}, description={}, roomType={}, masterId={}",
-                        roomName, description, roomType, masterId);
-                ret = new RoomData(roomId, roomName, description, roomType, masterId);
+                log.debug("roomName={}, description={}, roomType={}, masterId={}, thumbnail={}, coverImage={}, currentMembers={}",
+                        roomName, description, roomType, masterId, thumbnail, coverImage, currentMembers);
+                ret = new RoomData(roomId, roomName, description, roomType, masterId, thumbnail, coverImage, currentMembers);
                 break;
             }
         } catch (SQLException e) {
@@ -382,6 +408,72 @@ public class DBHelper {
         }
 
         log.info("updateRoomDescription() : END");
+    }
+
+    // 🆕 채팅방 썸네일 이미지 업데이트 메서드 추가
+    public void updateRoomThumbnail(Long roomId, String thumbnail) {
+        log.info("updateRoomThumbnail() - START, params : roomId = {}, thumbnail = {}", roomId, thumbnail);
+
+        String query = "UPDATE chat_rooms " +
+                "SET thumbnail = ? " +
+                "WHERE id = ? ;";
+
+        try (PreparedStatement psmt = conn.prepareStatement(query)) {
+            psmt.setString(1, thumbnail);
+            psmt.setLong(2, roomId);
+
+            log.debug("query = {}", psmt);
+
+            psmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        log.info("updateRoomThumbnail() : END");
+    }
+
+    // 🆕 채팅방 커버 이미지 업데이트 메서드 추가
+    public void updateRoomCoverImage(Long roomId, String coverImage) {
+        log.info("updateRoomCoverImage() - START, params : roomId = {}, coverImage = {}", roomId, coverImage);
+
+        String query = "UPDATE chat_rooms " +
+                "SET cover_image = ? " +
+                "WHERE id = ? ;";
+
+        try (PreparedStatement psmt = conn.prepareStatement(query)) {
+            psmt.setString(1, coverImage);
+            psmt.setLong(2, roomId);
+
+            log.debug("query = {}", psmt);
+
+            psmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        log.info("updateRoomCoverImage() : END");
+    }
+
+    // 🆕 채팅방 현재 멤버 수 업데이트 메서드 추가
+    public void updateRoomCurrentMembers(Long roomId, Integer currentMembers) {
+        log.info("updateRoomCurrentMembers() - START, params : roomId = {}, currentMembers = {}", roomId, currentMembers);
+
+        String query = "UPDATE chat_rooms " +
+                "SET current_members = ? " +
+                "WHERE id = ? ;";
+
+        try (PreparedStatement psmt = conn.prepareStatement(query)) {
+            psmt.setInt(1, currentMembers);
+            psmt.setLong(2, roomId);
+
+            log.debug("query = {}", psmt);
+
+            psmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        log.info("updateRoomCurrentMembers() : END");
     }
 
     // 채팅방에 소속된 유저의 id, nickname, profileimage 얻어오기
@@ -471,11 +563,11 @@ public class DBHelper {
 
     // 방장 나감 처리
     public void exitHost(Long roomId) {
-        log.info("exitHost(): START - params : roomId = {}" + roomId);
+        log.info("exitHost(): START - params : roomId = {}", roomId);
 
-        // exited_at이 null인 가장 최근 레코드의 퇴장시간 업데이트
+        // 🆕 방장이 나갈 때 master_user_id를 NULL로 설정 (외래키 제약조건 위반 방지)
         String query = "UPDATE chat_rooms " +
-                "SET master_user_id = 0 " +
+                "SET master_user_id = NULL " +
                 "WHERE id = ? ;";
 
         try (PreparedStatement psmt = conn.prepareStatement(query)) {
@@ -484,7 +576,10 @@ public class DBHelper {
             log.debug("query = {}", psmt);
 
             psmt.executeUpdate();
+            
+            log.info("방장 퇴장 처리 완료: roomId={}, master_user_id를 NULL로 설정", roomId);
         } catch (SQLException e) {
+            log.error("방장 퇴장 처리 실패: roomId={}, error={}", roomId, e.getMessage(), e);
             e.printStackTrace();
         }
 

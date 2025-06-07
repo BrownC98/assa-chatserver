@@ -222,13 +222,13 @@ public class MessageHandler {
                                 PerformanceLogger.Timer dbTimer = PerformanceLogger.startDatabaseTimer("insertRoom",
                                                 "chat_rooms");
                                 try {
+                                        // 🆕 이미지 URL들과 함께 방 생성
                                         roomId = dbHelper.insertRoom(command.roomName, command.description,
-                                                        command.roomType,
-                                                        command.requesterId);
+                                                        command.roomType, command.requesterId, command.thumbnail, command.coverImageUrl);
                                         long dbDuration = dbTimer.stop();
 
-                                        log.debug("오픈 채팅방 DB 저장 완료: userId={}, sessionId={}, operationId={}, roomId={}, dbDuration={}ms",
-                                                        user.id, user.getSessionId(), operationId, roomId, dbDuration);
+                                        log.debug("오픈 채팅방 DB 저장 완료: userId={}, sessionId={}, operationId={}, roomId={}, dbDuration={}ms, thumbnail={}, coverImageUrl={}",
+                                                        user.id, user.getSessionId(), operationId, roomId, dbDuration, command.thumbnail, command.coverImageUrl);
                                 } catch (SQLException e) {
                                         dbTimer.stop("ERROR: " + e.getMessage());
                                         log.error("오픈 채팅방 DB 저장 실패: userId={}, sessionId={}, operationId={}, roomName={}, error={}",
@@ -250,6 +250,9 @@ public class MessageHandler {
                                         newRoom.description = roomData.description;
                                         newRoom.roomType = roomData.roomType;
                                         newRoom.masterUserId = roomData.masterUserId;
+                                        newRoom.thumbnail = roomData.thumbnail; // 🆕 썸네일 이미지 설정
+                                        newRoom.coverImageUrl = roomData.coverImage; // 🆕 커버 이미지 설정 (DB의 cover_image를 coverImageUrl로 매핑)
+                                        newRoom.currentMembers = roomData.currentMembers; // 🆕 현재 멤버 수 설정
 
                                         log.debug("채팅방 데이터 로드 완료: userId={}, sessionId={}, operationId={}, roomId={}, loadDuration={}ms",
                                                         user.id, user.getSessionId(), operationId, roomId,
@@ -339,6 +342,12 @@ public class MessageHandler {
                         isInfoChange = true;
                 }
 
+                if (command.coverImageUrl != null) {
+                        dbHelper.updateRoomCoverImage(roomId, command.coverImageUrl);
+                        isInfoChange = true;
+                }
+
+
                 // 방데이터
                 RoomData roomData = dbHelper.getRoomData(roomId);
 
@@ -351,6 +360,9 @@ public class MessageHandler {
                 roomInfoCommand.roomName = roomData.roomName;
                 roomInfoCommand.description = roomData.description;
                 roomInfoCommand.roomType = roomData.roomType;
+                roomInfoCommand.thumbnail = roomData.thumbnail; // 🆕 썸네일 이미지 포함
+                roomInfoCommand.coverImageUrl = roomData.coverImage; // 🆕 커버 이미지 포함 (DB의 cover_image를 coverImageUrl로 매핑)
+                roomInfoCommand.currentMembers = roomData.currentMembers; // 🆕 현재 멤버 수 포함
 
                 if (isInfoChange) {
                         // 방 정보가 바뀌면 모든 멤버에게 정보가 바겼음을 알림

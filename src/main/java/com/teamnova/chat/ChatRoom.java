@@ -25,6 +25,9 @@ public class ChatRoom {
     public String roomName;
     public String description;
     public Long masterUserId;
+    public String thumbnail; // 🆕 채팅방 썸네일 이미지 필드 추가
+    public String coverImageUrl; // 🆕 오픈채팅방 커버 이미지 URL 필드 추가 (클라이언트 호환성)
+    public Integer currentMembers; // 🆕 현재 참여 멤버 수 필드 추가
 
     public List<User> userList = new CopyOnWriteArrayList<>(); // 이 채팅방에 속한 사용자 리스트
     public List<VideoRoom> videoRooms = new ArrayList<>();
